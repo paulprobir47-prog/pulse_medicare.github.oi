@@ -22,12 +22,13 @@ MYSQL_PORT=3306
 MYSQL_USER=
 MYSQL_PASSWORD=
 MYSQL_DATABASE=pulse_medicare
+MYSQL_SSL_MODE=REQUIRED
 ```
 
 Or a single URL:
 
 ```env
-MYSQL_URL=mysql://user:password@host:3306/pulse_medicare
+MYSQL_URL=mysql://user:password@host:3306/pulse_medicare?ssl-mode=REQUIRED
 ```
 
 If your MySQL provider requires a CA file, add it to Render as a secret file and set:

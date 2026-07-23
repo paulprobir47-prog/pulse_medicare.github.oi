@@ -23,3 +23,5 @@ services:
         sync: false
       - key: MYSQL_DATABASE
         sync: false
+      - key: MYSQL_SSL_MODE
+        value: REQUIRED

@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 import mysql.connector
 import os
-from urllib.parse import urlparse, unquote
+from urllib.parse import urlparse, unquote, parse_qs
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -140,6 +140,7 @@ def _mysql_config_from_env():
     mysql_url = os.environ.get("MYSQL_URL") or os.environ.get("DATABASE_URL")
     if mysql_url and mysql_url.startswith(("mysql://", "mysql+mysqlconnector://")):
         parsed = urlparse(mysql_url.replace("mysql+mysqlconnector://", "mysql://", 1))
+        query = parse_qs(parsed.query)
         config = {
             "host": parsed.hostname,
             "user": unquote(parsed.username or ""),
@@ -163,6 +164,9 @@ def _mysql_config_from_env():
     ssl_ca = os.environ.get("MYSQL_SSL_CA")
     if ssl_ca:
         config["ssl_ca"] = ssl_ca
+    ssl_mode = (os.environ.get("MYSQL_SSL_MODE") or (query.get("ssl-mode", [""])[0] if "query" in locals() else "")).upper()
+    if ssl_mode in {"REQUIRED", "VERIFY_CA", "VERIFY_IDENTITY"}:
+        config["ssl_disabled"] = False
     if _truthy_env("MYSQL_SSL_DISABLED"):
         config["ssl_disabled"] = True
 
