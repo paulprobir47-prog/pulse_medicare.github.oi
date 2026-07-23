@@ -4,17 +4,17 @@ import os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "pulsemedicare")
+app.secret_key = "pulsemedicare"
 app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "static", "uploads")
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 def _create_db_connection():
     try:
         return mysql.connector.connect(
-            host=os.environ.get("MYSQL_HOST", "localhost"),
-            user=os.environ.get("MYSQL_USER", "root"),
-            password=os.environ.get("MYSQL_PASSWORD", ""),
-            database=os.environ.get("MYSQL_DB", "pulse_medicare")
+            host="localhost",
+            user="root",
+            password="Prabir@321",
+            database="pulse_medicare"
         )
     except Exception:
         return None
