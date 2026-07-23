@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Saved</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #009688;
+    --surface-alt: #f8fbff;
+    --border: rgba(15,23,42,0.08);
+}
+
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --border: rgba(148,163,184,0.22);
+}
+body{background:var(--bg);font-family:'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:var(--text);}
+.panel{background:var(--surface);padding:40px;border-radius:18px;box-shadow:0 24px 60px rgba(15,23,42,.12);text-align:center;max-width:420px;width:100%;}
+.panel h1{color:var(--primary);margin-bottom:16px;}
+.panel p{color:var(--muted);margin-bottom:28px;}
+.btn{background:var(--primary);color:#fff;padding:14px 28px;border-radius:999px;text-decoration:none;font-weight:700;}
+.btn:hover{background:#00796B;}
+</style>
+</head>
+<body>
+<div class="panel">
+<h1>Patient Saved</h1>
+<p>The patient record was saved successfully.</p>
+<a class="btn" href="{{ url_for('patients') }}">Back to Patients</a>
+</div>
+<script>
+(function() {
+    if (localStorage.getItem('dashboardTheme') === 'dark') {
+        document.body.classList.add('dark');
+    }
+})();
+</script>
+{% include '_pro_infotech_footer.html' %}
+</body>
+</html>

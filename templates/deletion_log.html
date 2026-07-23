@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Deletion Log</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --text: #0f1f3a;
+    --muted: #64748b;
+    --primary: #009688;
+    --border: rgba(15,23,42,0.08);
+}
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --border: rgba(148,163,184,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:var(--bg);color:var(--text);}
+.container{max-width:1100px;margin:40px auto;padding:24px;background:var(--surface);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.08);border:1px solid var(--border);}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.header h1{color:var(--primary);}
+.table-box{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:14px 16px;border-bottom:1px solid #e2e8f0;text-align:left;}
+th{background:var(--primary);color:white;}
+.note{margin-top:16px;color:var(--muted);}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>Patient Deletion Log</h1>
+            <p class="note">Only users with admin privileges can view this page.</p>
+        </div>
+        <a href="/dashboard" class="btn" style="background:var(--primary);color:white;padding:12px 18px;border-radius:12px;text-decoration:none;">Back to Dashboard</a>
+    </div>
+    <div class="table-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Deleted By</th>
+                    <th>Reason</th>
+                    <th>Deleted At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ log.patient_id }}</td>
+                    <td>{{ log.full_name }}</td>
+                    <td>{{ log.deleted_by }}</td>
+                    <td>{{ log.reason }}</td>
+                    <td>{{ log.deleted_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+(function() {
+    if (localStorage.getItem('dashboardTheme') === 'dark') {
+        document.body.classList.add('dark');
+    }
+})();
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

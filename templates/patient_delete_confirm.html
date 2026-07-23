@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirm Delete Patient</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #d32f2f;
+    --surface-alt: #f8fbff;
+    --border: rgba(15,23,42,0.08);
+}
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #f87171;
+    --surface-alt: #111b2d;
+    --border: rgba(148,163,184,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:var(--bg);color:var(--text);}
+.container{max-width:640px;margin:80px auto;padding:24px;background:var(--surface);border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.08);border:1px solid var(--border);}
+.header{margin-bottom:20px;}
+.header h1{color:var(--primary);font-size:1.9rem;}
+.note{margin:20px 0;padding:18px;border-radius:12px;background:rgba(255,235,238,.9);color:#b91c1c;}
+.form-group{margin-bottom:18px;}
+label{display:block;margin-bottom:10px;font-weight:700;color:var(--muted);}
+textarea{width:100%;min-height:140px;padding:14px 16px;border:1px solid #cbd5e1;border-radius:12px;background:var(--surface-alt);color:var(--text);}
+.actions{display:flex;gap:16px;flex-wrap:wrap;}
+.btn{padding:14px 24px;border-radius:12px;border:none;cursor:pointer;font-weight:700;}
+.btn-delete{background:var(--primary);color:white;}
+.btn-cancel{background:#94a3b8;color:white;}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="container">
+    <div class="header">
+        <h1>Delete Patient</h1>
+        <p>Provide a reason for deletion. Only admin users can view the deletion history.</p>
+    </div>
+    <div class="note">
+        <strong>Patient:</strong> {{ patient.full_name }}<br>
+        <strong>ID:</strong> {{ patient.patient_id }}
+    </div>
+    <form method="POST" action="/delete_patient/{{ patient.patient_id }}">
+        <div class="form-group">
+            <label for="reason">Reason for deletion</label>
+            <textarea id="reason" name="reason" required placeholder="Enter why this patient record is being removed..."></textarea>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn btn-delete">Confirm Delete</button>
+            <a href="/patients" class="btn btn-cancel">Cancel</a>
+        </div>
+    </form>
+</div>
+<script>
+(function() {
+    if (localStorage.getItem('dashboardTheme') === 'dark') {
+        document.body.classList.add('dark');
+    }
+})();
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - Settings</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #009688;
+    --surface-alt: #f8fbff;
+    --border: rgba(15,23,42,0.08);
+}
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --border: rgba(148,163,184,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:var(--bg);color:var(--text);}
+.sidebar{position:fixed;width:80px;height:100%;background:var(--primary);color:#fff;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.35) transparent;transition:width .25s ease;}
+.sidebar:hover{width:240px;}
+.logo{text-align:center;padding:25px;border-bottom:1px solid rgba(255,255,255,.2);}
+.logo i{font-size:55px;}
+.logo h2{margin-top:10px;opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.logo p{opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.sidebar:hover .logo h2,
+.sidebar:hover .logo p{opacity:1;max-height:120px;}
+.sidebar:not(:hover) .logo{padding:18px 0;}
+.sidebar:not(:hover) .logo h2,
+.sidebar:not(:hover) .logo p{opacity:0;max-height:0;margin:0;padding:0;visibility:hidden;}
+.sidebar:not(:hover) .logo i{margin:0 auto;font-size:30px;}
+.sidebar ul{list-style:none;}
+.sidebar ul li{padding:16px 25px;transition:background .25s ease;}
+.sidebar ul li:hover{background:#00796B;}
+.sidebar ul li a{color:white;text-decoration:none;display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:font-size .25s ease,justify-content .25s ease,padding .25s ease;}
+.sidebar:not(:hover) ul li a{justify-content:center;font-size:0;}
+.sidebar:not(:hover) ul li a i{font-size:18px;}
+.main{margin-left:80px;padding:25px;width:calc(100% - 80px);transition:margin-left .25s ease,width .25s ease;}
+.sidebar:hover + .main{margin-left:240px;width:calc(100% - 240px);}
+.panel{background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08);border:1px solid var(--border);}
+.panel h2{color:#009688;margin-bottom:15px;}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.theme-toggle, .notification-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:var(--surface);color:var(--text);font-weight:700;cursor:pointer;text-decoration:none;}
+.theme-toggle:hover, .notification-btn:hover{background:rgba(0,0,0,.05);}
+.notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#ef4444;color:white;font-size:0.75rem;font-weight:700;}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-weight:700;color:#334155;font-size:0.95rem;}
+.form-group input, .form-group select, .form-group textarea{padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;background:var(--surface-alt);color:var(--text);font-size:0.95rem;}
+.form-group textarea{min-height:100px;}
+.form-actions{margin-top:20px;display:flex;gap:14px;flex-wrap:wrap;}
+.btn, .btn-secondary{padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700;border:none;cursor:pointer;}
+.btn{background:#009688;color:white;}
+.btn-secondary{background:#e2e8f0;color:#0f172a;}
+.btn:hover{background:#00796B;}
+@media(max-width:900px){.form-grid{grid-template-columns:1fr;}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="main">
+    <div class="panel">
+        <div class="topbar">
+            <h2>Settings</h2>
+            <div class="topbar-right">
+                <button type="button" id="themeToggle" class="theme-toggle"><i class="fa fa-moon"></i> Dark</button>
+                <button type="button" class="notification-btn"><i class="fa fa-bell"></i><span class="notification-badge">3</span></button>
+            </div>
+        </div>
+        <form method="POST" action="/settings">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="hospital_name">Hospital Name</label>
+                    <input id="hospital_name" type="text" name="hospital_name" value="{{ settings.hospital_name | default('') }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="hospital_logo">Hospital Logo URL</label>
+                    <input id="hospital_logo" type="text" name="hospital_logo" value="{{ settings.hospital_logo | default('') }}">
+                </div>
+                <div class="form-group" style="grid-column:span 2;">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address">{{ settings.address | default('') }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input id="city" type="text" name="city" value="{{ settings.city | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input id="state" type="text" name="state" value="{{ settings.state | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <input id="country" type="text" name="country" value="{{ settings.country | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="postal_code">Postal Code</label>
+                    <input id="postal_code" type="text" name="postal_code" value="{{ settings.postal_code | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="tel" name="phone" value="{{ settings.phone | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" name="email" value="{{ settings.email | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="website">Website</label>
+                    <input id="website" type="text" name="website" value="{{ settings.website | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="currency">Currency</label>
+                    <input id="currency" type="text" name="currency" value="{{ settings.currency | default('INR') }}">
+                </div>
+                <div class="form-group">
+                    <label for="timezone">Timezone</label>
+                    <input id="timezone" type="text" name="timezone" value="{{ settings.timezone | default('Asia/Kolkata') }}">
+                </div>
+                <div class="form-group">
+                    <label for="theme">Theme</label>
+                    <select id="theme" name="theme">
+                        <option value="Light" {% if settings.theme == 'Light' %}selected{% endif %}>Light</option>
+                        <option value="Dark" {% if settings.theme == 'Dark' %}selected{% endif %}>Dark</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="language">Language</label>
+                    <input id="language" type="text" name="language" value="{{ settings.language | default('English') }}">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn" type="submit">Save Settings</button>
+                <a class="btn-secondary" href="{{ url_for('dashboard') }}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+(function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const storedTheme = localStorage.getItem('dashboardTheme');
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            body.classList.add('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-sun"></i> Light';
+        } else {
+            body.classList.remove('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-moon"></i> Dark';
+        }
+        localStorage.setItem('dashboardTheme', theme);
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = body.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+    }
+
+    applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
+})();
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

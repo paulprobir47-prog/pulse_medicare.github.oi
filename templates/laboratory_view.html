@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>View Laboratory Test</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f9;color:#0f172a;margin:0;padding:20px}
+.container{max-width:900px;margin:0 auto}
+.card{background:#fff;padding:20px;border-radius:8px;border:1px solid rgba(0,0,0,0.04)}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.col{flex:1;min-width:180px}
+.label{color:#64748b;font-weight:700;font-size:12px}
+.value{font-size:16px;margin-top:6px}
+.actions{margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;text-decoration:none;border:none;cursor:pointer}
+.btn-primary{background:#009688;color:#fff}
+.btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.06)}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="container">
+    <div class="card">
+        <h2>Laboratory Test Details</h2>
+        <div class="row">
+            <div class="col"><div class="label">Test ID</div><div class="value">{{ lab.lab_id }}</div></div>
+            <div class="col"><div class="label">Patient</div><div class="value">{{ lab.patient_name or '—' }}</div></div>
+            <div class="col"><div class="label">Doctor</div><div class="value">{{ lab.doctor_name or '—' }}</div></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+            <div class="col"><div class="label">Test</div><div class="value">{{ lab.test_name }}</div></div>
+            <div class="col"><div class="label">Sample Type</div><div class="value">{{ lab.sample_type }}</div></div>
+            <div class="col"><div class="label">Date</div><div class="value">{{ lab.test_date }}</div></div>
+        </div>
+        <div style="margin-top:12px">
+            <div class="label">Result</div>
+            <div class="value">{{ lab.result or 'Not entered' }}</div>
+        </div>
+        <div style="margin-top:12px">
+            <div class="label">Normal Range</div>
+            <div class="value">{{ lab.normal_range or '—' }}</div>
+        </div>
+        <div style="margin-top:12px">
+            <div class="label">Status</div>
+            <div class="value">{{ lab.status }}</div>
+        </div>
+        <div class="actions">
+            <a class="btn btn-primary" href="/edit_laboratory/{{ lab.lab_id }}"><i class="fa fa-pen"></i> Edit</a>
+            <a class="btn btn-ghost" href="/print_laboratory/{{ lab.lab_id }}"><i class="fa fa-print"></i> Print</a>
+            <form action="/delete_laboratory/{{ lab.lab_id }}" method="post" style="display:inline">
+                <button class="btn btn-ghost" type="submit"><i class="fa fa-trash"></i> Delete</button>
+            </form>
+            <a class="btn" href="/laboratory" style="background:#e6f7f3;color:#065a50;text-decoration:none"><i class="fa fa-arrow-left"></i> Back</a>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - Patients</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --text: #0f1f3a;
+    --muted: #64748b;
+    --primary: #009688;
+    --surface-alt: #f8fafc;
+    --sidebar: #009688;
+    --border: rgba(15,23,42,0.08);
+}
+
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --sidebar: #071821;
+    --border: rgba(148,163,184,0.22);
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+}
+
+.sidebar{
+position:fixed;
+width:80px;
+height:100vh;
+max-height:100vh;
+background:var(--sidebar);
+color:#fff;
+overflow-y:auto;
+overflow-x:hidden;
+scrollbar-width:thin;
+scrollbar-color:rgba(255,255,255,0.35) transparent;
+-webkit-overflow-scrolling:touch;
+transition:width .25s ease;
+}
+
+.sidebar:hover{
+width:240px;
+}
+
+.logo{
+text-align:center;
+padding:25px;
+border-bottom:1px solid rgba(255,255,255,.2);
+}
+
+.logo i{
+font-size:55px;
+}
+
+.logo h2{
+margin-top:10px;
+opacity:0;
+max-height:0;
+overflow:hidden;
+transition:opacity .25s ease,max-height .25s ease;
+}
+
+.logo p{
+opacity:0;
+max-height:0;
+overflow:hidden;
+transition:opacity .25s ease,max-height .25s ease;
+}
+
+.sidebar:hover .logo h2,
+.sidebar:hover .logo p{
+opacity:1;
+max-height:120px;
+}
+
+.sidebar:not(:hover) .logo{padding:18px 0;}
+.sidebar:not(:hover) .logo h2,
+.sidebar:not(:hover) .logo p{opacity:0;max-height:0;margin:0;padding:0;visibility:hidden;}
+.sidebar:not(:hover) .logo i{margin:0 auto;font-size:30px;}
+
+.sidebar ul{
+list-style:none;
+}
+
+.sidebar ul li{
+padding:16px 25px;
+transition:background .25s ease;
+}
+
+.sidebar ul li:hover{
+background:#00796B;
+}
+
+.sidebar ul li a{
+color:white;
+text-decoration:none;
+display:flex;
+align-items:center;
+gap:12px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+.sidebar:not(:hover) ul li a{
+    justify-content:center;
+    gap:0;
+    font-size:0;
+    padding:16px 0;
+    width:100%;
+    min-height:48px;
+    line-height:1;
+    overflow:visible;
+}
+.sidebar:not(:hover) ul li a i{
+    font-size:20px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:100%;
+}
+
+.main{
+margin-left:80px;
+padding:25px;
+background:var(--bg);
+width:calc(100% - 80px);
+transition:margin-left .25s ease,width .25s ease;
+}
+
+.sidebar:hover + .main{
+margin-left:240px;
+width:calc(100% - 240px);
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.topbar h2{
+color:var(--primary);
+}
+
+.topbar-right{
+display:flex;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.theme-toggle, .notification-btn{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:10px 14px;
+border-radius:10px;
+border:1px solid var(--border);
+background:var(--surface);
+color:var(--text);
+font-weight:700;
+cursor:pointer;
+text-decoration:none;
+transition:background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.theme-toggle:hover, .notification-btn:hover{
+background:var(--primary);
+color:#fff;
+border-color:var(--primary);
+}
+
+.notification-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+min-width:20px;
+height:20px;
+padding:0 6px;
+border-radius:999px;
+background:#ef4444;
+color:white;
+font-size:0.75rem;
+font-weight:700;
+}
+
+.btn{
+background:var(--primary);
+color:white;
+padding:10px 20px;
+text-decoration:none;
+border-radius:5px;
+}
+
+.btn:hover{
+background:#00796B;
+}
+
+.table-box{
+background:var(--surface);
+padding:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,.12);
+overflow-x:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:left;
+}
+
+th{
+background:var(--primary);
+color:white;
+}
+
+.edit{
+color:blue;
+text-decoration:none;
+margin-right:10px;
+}
+
+.delete{
+color:red;
+text-decoration:none;
+}
+
+</style>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+
+<body>
+
+{% include '_sidebar.html' %}
+<div class="main">
+
+<div class="topbar">
+
+<h2>Patients Management</h2>
+
+<div class="topbar-right">
+    <button type="button" id="themeToggle" class="theme-toggle"><i class="fa fa-moon"></i> Dark</button>
+    <button type="button" class="notification-btn"><i class="fa fa-bell"></i><span class="notification-badge">3</span></button>
+    {% if user_role == 'admin' %}
+    <a href="/deletion_log" class="btn" style="margin-right:12px;"><i class="fa fa-list"></i> Deletion Log</a>
+    {% endif %}
+    <a href="/add_patient" class="btn"><i class="fa fa-plus"></i> Add Patient</a>
+    <form action="{{ url_for('patients') }}" method="get" style="display:flex;align-items:center;gap:6px;">
+        <input type="text" name="q" value="{{ query | default('') }}" placeholder="Search patients..." style="padding:8px 12px;border-radius:6px;border:1px solid #cbd5e1;" />
+        <button type="submit" class="btn" style="padding:10px 16px;">Search</button>
+    </form>
+</div>
+
+</div>
+
+{% if error %}
+<div style="color:#b91c1c;background:#fff7f7;padding:12px;border:1px solid #f5c2c2;border-radius:6px;margin-bottom:12px;">{{ error }}</div>
+{% endif %}
+
+<div class="table-box">
+
+<table>
+
+<tr>
+
+<th>No.</th>
+<th>ID</th>
+<th>Bill No</th>
+<th>Name</th>
+<th>Age</th>
+<th>Gender</th>
+<th>Phone</th>
+<th>Guardian</th>
+<th>Blood Group</th>
+<th>Disease</th>
+<th>Admission Date</th>
+<th>Action</th>
+
+</tr>
+
+{% for patient in patients %}
+
+<tr>
+
+<td>{{ loop.index }}</td>
+<td>{{ patient.patient_id }}</td>
+<td>BILL-{{ patient.patient_id }}</td>
+<td>{{ patient.full_name }}</td>
+<td>{{ patient.age }}</td>
+<td>{{ patient.gender }}</td>
+<td>{{ patient.phone }}</td>
+<td>{{ patient.guardian_name or '-' }}{% if patient.guardian_phone %} <br><small>{{ patient.guardian_phone }}</small>{% endif %}</td>
+<td>{{ patient.blood_group }}</td>
+<td>{{ patient.disease }}</td>
+<td>{{ patient.admission_date }}</td>
+
+<td>
+
+<a href="/edit_patient/{{ patient.patient_id }}" class="edit">
+<i class="fa fa-pen"></i>
+</a>
+
+<form action="/delete_patient/{{ patient.patient_id }}" method="get" style="display:inline;">
+    <button type="submit" class="delete" style="background:none;border:none;cursor:pointer;padding:0;color:red;">
+        <i class="fa fa-trash"></i>
+    </button>
+</form>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+(function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const storedTheme = localStorage.getItem('dashboardTheme');
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            body.classList.add('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-sun"></i> Light';
+        } else {
+            body.classList.remove('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-moon"></i> Dark';
+        }
+        localStorage.setItem('dashboardTheme', theme);
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = body.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+    }
+
+    applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
+})();
+</script>
+
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

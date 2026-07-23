@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Invoice #{{ bill.bill_id }}</title>
+    <style>
+        :root{--accent:#0f766e;--muted:#6b7280;--bg:#f7fafc;--paper:#ffffff}
+        *{box-sizing:border-box}
+        body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);margin:0;color:#0f172a}
+        .paper{max-width:900px;margin:28px auto;background:var(--paper);padding:28px;border-radius:12px;border:1px solid rgba(15,23,42,0.06)}
+        .top{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+        .brand{display:flex;flex-direction:column}
+        .brand h1{margin:0;color:var(--accent);font-size:26px}
+        .meta{text-align:right}
+        .meta h3{margin:0;font-size:18px}
+        .row{display:flex;gap:18px;margin-top:18px}
+        .col{flex:1}
+        .box{background:#f8fafc;padding:14px;border-radius:10px;border:1px solid rgba(15,23,42,0.04)}
+        table{width:100%;border-collapse:collapse;margin-top:16px}
+        th,td{padding:12px 10px;border-bottom:1px solid rgba(15,23,42,0.04);text-align:left}
+        th{background:rgba(15,118,110,0.06);font-weight:700}
+        tfoot td{font-weight:700}
+        .right{text-align:right}
+        .qr-wrap{text-align:center}
+        .qr-wrap img{width:120px;height:120px;max-width:100%;}
+        .small{font-size:13px;color:var(--muted)}
+        .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+        .btn{border:0;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+        .btn-print{background:var(--accent);color:#fff}
+        .btn-back{background:#eef2ff;color:#0f172a}
+        @media(max-width:760px){.top{flex-direction:column}.meta{text-align:left}}
+    </style>
+    <link rel="preconnect" href="https://api.qrserver.com">
+    <link rel="preconnect" href="https://chart.googleapis.com">
+</head>
+<body>
+    <div class="paper">
+        <div class="top">
+            <div class="brand">
+                <h1>{{ settings.hospital_name or 'Pulse Medicare' }}</h1>
+                <div class="small">{{ settings.address or '' }}</div>
+                <div class="small">{{ settings.city or '' }} {{ settings.state or '' }} {{ settings.postal_code or '' }}</div>
+                <div class="small">{{ settings.phone or '' }} • {{ settings.email or '' }}</div>
+            </div>
+
+            <div class="meta">
+                <h3>Invoice</h3>
+                <div class="small">Invoice #: <strong>{{ bill.bill_id }}</strong></div>
+                <div class="small">Date: <strong>{{ bill.bill_date }}</strong></div>
+                <div class="small">Patient: <strong>{{ bill.patient_name }}</strong></div>
+                <div class="small">Doctor: <strong>{{ bill.doctor_name }}</strong></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="box">
+                    <div class="small">Billing Details</div>
+                    <table>
+                        <thead>
+                            <tr><th>Description</th><th class="right">Amount</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Consultation Fee</td><td class="right">{{ bill.consultation_fee }}</td></tr>
+                            <tr><td>Medicine Fee</td><td class="right">{{ bill.medicine_fee }}</td></tr>
+                            <tr><td>Lab Fee</td><td class="right">{{ bill.lab_fee }}</td></tr>
+                            <tr><td>Room Fee</td><td class="right">{{ bill.room_fee }}</td></tr>
+                            <tr><td>Other Charges</td><td class="right">{{ bill.other_charges }}</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr><td>Total</td><td class="right">{{ bill.total_amount }}</td></tr>
+                        </tfoot>
+                    </table>
+                    <div class="small" style="margin-top:12px">Payment Method: <strong>{{ bill.payment_method }}</strong> — Status: <strong>{{ bill.payment_status }}</strong></div>
+                </div>
+            </div>
+
+            <div style="width:140px">
+                <div class="box qr-wrap">
+                    <div class="small" style="margin-bottom:8px">Scan to view invoice / pay</div>
+                    {% if qr_data %}
+                        <img alt="QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ qr_data | urlencode }}">
+                    {% else %}
+                        <div class="small">QR not available</div>
+                    {% endif %}
+                </div>
+                <div class="small" style="margin-top:10px;text-align:center">Powered by Pulse Medicare</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-print" onclick="window.print()">Print</button>
+            <a class="btn btn-back" href="{{ url_for('billing') }}">Back to Billing</a>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function(){
+            setTimeout(function(){ window.print(); }, 150);
+        });
+    </script>
+    {% include '_pro_infotech_footer.html' %}
+</body>
+</html>
+            

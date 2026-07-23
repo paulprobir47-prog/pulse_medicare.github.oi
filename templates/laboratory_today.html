@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Today's Lab Collection</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>body{font-family:Arial;margin:20px;background:#f4f6f9;color:#111}.card{background:#fff;padding:16px;border-radius:8px;border:1px solid #eee}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left}</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head><body>
+{% include '_sidebar.html' %}
+<div class="card">
+<h2>Today's Lab Collection</h2>
+<table class="table"><thead><tr><th>Bill ID</th><th>Patient</th><th>Lab Fee</th><th>Date</th><th>Action</th></tr></thead><tbody>
+{% if rows %}
+{% for r in rows %}
+<tr>
+<td>{{ r.bill_id }}</td>
+<td>{{ r.patient_name }}</td>
+<td>₹ {{ r.lab_fee }}</td>
+<td>{{ r.bill_date }}</td>
+<td><a href="/billing/print/{{ r.bill_id }}">Print</a></td>
+</tr>
+{% endfor %}
+{% else %}
+<tr><td colspan="5">No lab transactions today.</td></tr>
+{% endif %}
+</tbody></table>
+</div>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body></html>

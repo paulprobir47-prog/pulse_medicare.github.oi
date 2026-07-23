@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Update Rate</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+<style>
+/* reuse compact layout from LIMS settings */
+:root{--bg:#f4f6f9;--surface:#fff;--text:#0f172a;--muted:#64748b;--primary:#065a50;--border:#e5e7eb}
+body{font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#f8fbff 0%,#eef4ff 100%);color:var(--text);margin:0}
+.container{max-width:1480px;margin:28px auto;padding:0 24px 24px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;padding:22px 24px;border-radius:20px;background:linear-gradient(135deg,var(--primary) 0%,#0f766e 100%);color:#fff;box-shadow:0 16px 40px rgba(15,23,42,.08)}
+.header h1{margin:0;font-size:26px;color:#fff}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:0 16px 40px rgba(15,23,42,.08)}
+.layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
+.form-row{display:grid;grid-template-columns:1fr;gap:14px}
+.field-group{display:grid;gap:8px}
+input,select,button,textarea{padding:11px 12px;border:1px solid var(--border);border-radius:10px;font:inherit}
+.btn{background:var(--primary);color:#fff;border:0;padding:10px 12px;border-radius:10px;cursor:pointer}
+.btn-ghost{background:#fff;border:1px solid var(--border);color:var(--primary)}
+.small-hint{color:var(--muted);font-size:13px}
+.filter-row{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:14px;align-items:end}
+.filter-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.table-wrap{overflow:auto;margin-top:14px;max-height:620px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{padding:12px 10px;text-align:left;border-bottom:1px solid #f1f5f9}
+th{background:#f8fafc;font-weight:700}
+.card-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.card-header h3{margin:0}
+@media(max-width:1200px){.layout{grid-template-columns:1fr}.container{max-width:100%}}
+@media(max-width:760px){.filter-row{grid-template-columns:1fr}.card-header{flex-direction:column;align-items:flex-start}.container{padding:0 14px 18px}.header{padding:18px 20px}}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="container">
+  <div class="header">
+    <h1><i class="fa fa-arrow-up-right-from-square"></i> Update Rate For Default</h1>
+    <a class="btn btn-ghost" href="{{ url_for('laboratory_dashboard') }}">Back to Dashboard</a>
+  </div>
+
+  <div class="layout">
+    <aside class="card">
+      <div class="card-header">
+        <div>
+          <h3>Update Rate</h3>
+          <p class="small-hint">Pick a category and enter the new rate.</p>
+        </div>
+      </div>
+      <form id="updateRateForm" method="post" action="{{ url_for('update_rate') }}">
+        <div class="field-group">
+          <label class="small-hint">Category</label>
+          <select id="category_select" name="category_id">
+            <option value="">-- Select Test Category --</option>
+            {% for c in rate_categories %}
+            <option value="{{ c.id }}" data-rate="{{ c.rate if c.rate is not none else '' }}" {% if selected_category_id and selected_category_id == c.id|string %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="small-hint">Current Rate</label>
+          <input type="text" readonly value="{{ selected_category_rate if selected_category_rate is not none else '' }}">
+        </div>
+        <div class="field-group">
+          <label class="small-hint">New Rate</label>
+          <input id="new_rate" type="number" name="new_rate" step="0.01" min="0" value="{{ selected_category_rate if selected_category_rate is not none else '' }}">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn" type="submit" name="action" value="update_rate">Update Rate</button>
+          <a class="btn btn-ghost" href="{{ url_for('laboratory_dashboard') }}">Back</a>
+        </div>
+      </form>
+    </aside>
+
+    <main class="card">
+      <div class="card-header">
+        <div>
+          <h3>Rate List</h3>
+          <p class="small-hint">Filter the tests and categories below.</p>
+        </div>
+      </div>
+      <form id="searchForm" method="post" action="{{ url_for('update_rate') }}">
+        <div class="filter-row">
+          <div class="field-group">
+            <label class="small-hint">Department</label>
+            <select id="department" name="department">
+              <option value="">-- Select Department --</option>
+              {% for d in departments %}
+              <option value="{{ d.department }}" {% if request.form.get('department')==d.department %}selected{% endif %}>{{ d.department }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="small-hint">Sub Department</label>
+            <select id="subdepartment" name="subdepartment">
+              <option value="">-- Select Sub Department --</option>
+              {% for s in subdepartments %}
+              <option value="{{ s }}" {% if request.form.get('subdepartment')==s %}selected{% endif %}>{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="small-hint">Test Category</label>
+            <select id="filter_category" name="category_id">
+              <option value="">-- Select Test Category --</option>
+              {% for c in rate_categories %}
+              <option value="{{ c.id }}" {% if request.form.get('category_id')==c.id|string %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="filter-actions" style="margin-top:10px">
+          <button class="btn" type="submit" name="action" value="search">Search</button>
+          <button class="btn btn-ghost" type="button" onclick="clearFilters()">Clear</button>
+        </div>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Test Name</th>
+              <th>Test Code</th>
+              <th>Department</th>
+              <th>Sub Department</th>
+              <th>Test Category</th>
+              <th>Schema Code</th>
+              <th>Lab Rate</th>
+              <th>Patient Rate/MRP</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if results and results|length > 0 %}
+              {% for r in results %}
+              <tr>
+                <td>{{ r.test_name or '' }}</td>
+                <td>{{ r.get('test_code','') }}</td>
+                <td>{{ r.get('department','') }}</td>
+                <td>{{ r.sample_type or '' }}</td>
+                <td>{{ selected_category_name or '' }}</td>
+                <td>{{ r.get('schema_code','') }}</td>
+                <td>{{ selected_category_rate if selected_category_rate is not none else '' }}</td>
+                <td>{{ r.get('patient_rate','') }}</td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="8" class="small-hint">No results to show.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const categorySelect = document.getElementById('category_select')
+  const categoryIdInput = document.getElementById('category_id')
+  const categoryNameInput = document.getElementById('category_name')
+  const newRateInput = document.getElementById('new_rate')
+
+  if (categorySelect) {
+    categorySelect.addEventListener('change', function() {
+      const option = categorySelect.selectedOptions[0]
+      if (!option) return
+      const id = option.value
+      const name = option.textContent.trim()
+      const rate = option.dataset.rate || ''
+      if (categoryIdInput) categoryIdInput.value = id
+      if (categoryNameInput) categoryNameInput.value = name
+      if (newRateInput) newRateInput.value = rate
+    })
+  }
+})
+</script>
+<script src="{{ url_for('static', filename='js/update_rate.js') }}"></script>
+</body>
+</html>

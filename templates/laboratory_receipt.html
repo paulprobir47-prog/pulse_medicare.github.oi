@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laboratory Receipt</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:20px;color:#111}
+.receipt{max-width:800px;margin:0 auto;background:#fff;padding:20px;border:1px solid #eee}
+.header{display:flex;justify-content:space-between;align-items:center}
+.header h1{margin:0;font-size:20px}
+.section{margin-top:12px}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:8px;border:1px solid #eee;text-align:left}
+.print-note{margin-top:16px;font-size:13px;color:#666}
+@media print{.no-print{display:none}}
+</style>
+</head>
+<body>
+<div class="receipt">
+    <div class="header">
+        <h1>Pulse Medicare Laboratory</h1>
+        <div>
+            <div>Test ID: {{ lab.lab_id }}</div>
+            <div>Date: {{ lab.test_date }}</div>
+        </div>
+    </div>
+    <div class="section">
+        <strong>Patient:</strong> {{ lab.patient_name or '—' }}<br>
+        <strong>Doctor:</strong> {{ lab.doctor_name or '—' }}
+    </div>
+    <div class="section">
+        <table class="table">
+            <tr><th>Test</th><td>{{ lab.test_name }}</td></tr>
+            <tr><th>Sample Type</th><td>{{ lab.sample_type }}</td></tr>
+            <tr><th>Result</th><td>{{ lab.result or '—' }}</td></tr>
+            <tr><th>Normal Range</th><td>{{ lab.normal_range or '—' }}</td></tr>
+            <tr><th>Status</th><td>{{ lab.status }}</td></tr>
+        </table>
+    </div>
+    <div class="print-note no-print">
+        <button onclick="window.print()">Print</button>
+        <a href="/laboratory">Back to list</a>
+    </div>
+</div>
+{% include '_pro_infotech_footer.html' %}
+</body>
+</html>

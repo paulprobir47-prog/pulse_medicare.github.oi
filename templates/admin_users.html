@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulse Medicare - User Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #eef3f8;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --primary: #0f766e;
+            --primary-soft: #ccfbf1;
+            --border: rgba(15, 23, 42, 0.1);
+            --shadow: 0 14px 34px rgba(15, 23, 42, 0.07);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+        .main {
+            min-width: 0;
+            padding: 18px 18px 48px;
+        }
+        .page-header,
+        .stat-card,
+        .panel,
+        .flash {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding: 16px 18px;
+            flex-wrap: wrap;
+        }
+        .page-header h1 {
+            margin: 0 0 3px;
+            font-size: 22px;
+            letter-spacing: 0;
+        }
+        .page-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+        .flash-stack {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .flash {
+            padding: 10px 12px;
+            color: #155e75;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .flash.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+        .flash.success {
+            background: #ecfdf5;
+            color: #047857;
+            border-color: #bbf7d0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .stat-card {
+            padding: 14px 16px;
+        }
+        .stat-card h3 {
+            margin: 0 0 4px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .stat-card .value {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+            gap: 14px;
+            align-items: start;
+        }
+        .panel {
+            min-width: 0;
+            padding: 16px;
+        }
+        .panel h2,
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 12px;
+            font-size: 17px;
+            line-height: 1.25;
+        }
+        .section-title {
+            margin-top: 18px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 0;
+        }
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font: inherit;
+        }
+        .btn {
+            min-height: 34px;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 11px;
+            color: var(--text);
+            background: #e2e8f0;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-warning { background: #ea580c; color: #fff; }
+        .btn-success { background: #059669; color: #fff; }
+        .btn-compact {
+            min-height: 30px;
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        .table {
+            width: 100%;
+            min-width: 860px;
+            border-collapse: collapse;
+        }
+        .table th,
+        .table td {
+            padding: 9px 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        .table tr:last-child td {
+            border-bottom: 0;
+        }
+        .table th {
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .table td {
+            overflow-wrap: anywhere;
+        }
+        .roles-table {
+            min-width: 420px;
+        }
+        .actions-cell {
+            width: 200px;
+        }
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+        }
+        .status-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .status-btn {
+            min-height: 26px;
+            padding: 4px 8px;
+            border: 0;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .status-btn.active {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+        .status-btn.inactive {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .action-group form {
+            margin: 0;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1;
+            white-space: nowrap;
+        }
+        .badge-inactive {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .form-divider {
+            height: 1px;
+            margin: 18px 0;
+            background: var(--border);
+        }
+        @media (max-width: 1180px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 760px) {
+            .main {
+                padding: 12px 10px 42px;
+            }
+            .stats-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .page-header,
+            .panel,
+            .stat-card {
+                padding: 12px;
+            }
+            .page-header h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="main">
+    <div class="page-header">
+        <div>
+            <h1>User & Role Management</h1>
+            <p>Manage access, assign roles, and maintain secure permissions.</p>
+        </div>
+        <span class="badge">Admin Console</span>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-stack">
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Users</h3>
+            <div class="value">{{ users|length }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Total Roles</h3>
+            <div class="value">{{ roles|length }}</div>
+        </div>
+        <div class="stat-card">
+            <h3>Access Level</h3>
+            <div class="value">Administrator</div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="panel">
+            <h2><i class="fa fa-users-cog"></i> Manage User Roles</h2>
+            <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td>{{ u.username }}</td>
+                        <td>{{ u.full_name or '-' }}</td>
+                        <td>{{ u.email or '-' }}</td>
+                        <td>{{ u.phone or '-' }}</td>
+                        <td><span class="badge">{{ u.role }}</span></td>
+                        <td>
+                            <div class="status-cell">
+                                {% if u.active|int == 1 %}
+                                <span class="badge">Active</span>
+                                {% else %}
+                                <span class="badge badge-inactive">Inactive</span>
+                                {% endif %}
+                                <form method="post" action="/admin/users">
+                                    <input type="hidden" name="action" value="toggle_active" />
+                                    <input type="hidden" name="username" value="{{ u.username }}" />
+                                    {% if u.active|int == 1 %}
+                                    <button class="status-btn inactive" type="submit"><i class="fa fa-pause"></i> Deactivate</button>
+                                    {% else %}
+                                    <button class="status-btn active" type="submit"><i class="fa fa-play"></i> Activate</button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </td>
+                        <td class="actions-cell">
+                            <div class="action-group">
+                            <a class="btn btn-compact" href="/admin/edit_user/{{ u.username }}"><i class="fa fa-pen"></i> Edit</a>
+                            <form method="post" action="/admin/users" onsubmit="return confirm('Delete user {{ u.username }}?');">
+                                <input type="hidden" name="action" value="delete_user" />
+                                <input type="hidden" name="username" value="{{ u.username }}" />
+                                <button class="btn btn-danger btn-compact" type="submit"><i class="fa fa-trash"></i> Delete</button>
+                            </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2><i class="fa fa-shield"></i> Role Settings</h2>
+
+            <h3 class="section-title"><i class="fa fa-user-plus"></i> Create User</h3>
+            <form method="post" action="/admin/users">
+                <input type="hidden" name="action" value="add_user" />
+                <div class="form-grid">
+                <div class="form-group">
+                    <label for="new_username">Username</label>
+                    <input id="new_username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_password">Password</label>
+                    <input id="new_password" name="password" type="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_full_name">Full Name</label>
+                    <input id="new_full_name" name="full_name">
+                </div>
+                <div class="form-group">
+                    <label for="new_email">Email</label>
+                    <input id="new_email" name="email" type="email">
+                </div>
+                <div class="form-group">
+                    <label for="new_phone">Phone</label>
+                    <input id="new_phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="new_role">Role</label>
+                    <select id="new_role" name="role">
+                        {% for r in roles %}
+                        <option value="{{ r.role_name }}">{{ r.role_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Create User</button>
+            </form>
+
+            <div class="form-divider"></div>
+
+            <form method="post" action="/admin/users">
+                <input type="hidden" name="action" value="add_role" />
+                <div class="form-group">
+                    <label for="role_name">Role Name</label>
+                    <input id="role_name" type="text" name="role_name" placeholder="e.g. manager" required>
+                </div>
+                <div class="form-group">
+                    <label for="role_description">Description</label>
+                    <textarea id="role_description" name="role_description" rows="3" placeholder="Describe the role"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Role</button>
+            </form>
+
+            <h2 class="section-title"><i class="fa fa-list"></i> Available Roles</h2>
+            <div class="table-wrap">
+            <table class="table roles-table">
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Description</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for role in roles %}
+                    <tr>
+                        <td>{{ role.role_name }}</td>
+                        <td>{{ role.role_description or '-' }}</td>
+                        <td>
+                            {% if role.role_name not in ['admin','administrator','system_admin','user','lab','doctor'] %}
+                            <form method="post" action="/admin/users">
+                                <input type="hidden" name="action" value="delete_role" />
+                                <input type="hidden" name="role_name" value="{{ role.role_name }}" />
+                                <button type="submit" class="btn btn-danger btn-compact"><i class="fa fa-trash"></i> Delete</button>
+                            </form>
+                            {% else %}
+                            <span class="badge">Protected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

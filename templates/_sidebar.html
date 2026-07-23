@@ -1,0 +1,153 @@
+{% set endpoint = request.endpoint or '' %}
+{% set role = (session.get('role') or '')|lower %}
+<aside class="app-sidebar sidebar" id="appSidebar" aria-label="Main navigation">
+    <div class="app-sidebar__brand">
+        <a href="{{ url_for('dashboard') }}" class="app-sidebar__brand-link" aria-label="Pulse Medicare dashboard">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span class="app-sidebar__brand-text">
+                <strong>Pulse</strong>
+                <small>Medicare</small>
+            </span>
+        </a>
+        <button type="button" class="app-sidebar__toggle" id="sidebarToggle" aria-label="Expand sidebar" aria-expanded="false">
+            <i class="fa fa-angles-right"></i>
+        </button>
+    </div>
+
+    <div class="app-sidebar__search" role="search">
+        <i class="fa fa-search" aria-hidden="true"></i>
+        <input
+            type="search"
+            id="sidebarSearchInput"
+            placeholder="Search menu"
+            aria-label="Search menu"
+            autocomplete="off"
+        >
+    </div>
+    <div class="app-sidebar__search-results" id="sidebarSearchResults" aria-live="polite"></div>
+    <div class="app-sidebar__search-hint" id="sidebarSearchHint">Type to filter menu items</div>
+
+    <nav class="app-sidebar__nav">
+        <ul>
+            {% for item in sidebar_menu_items %}
+            {% set item_is_active = request.path == item.url or (item.url and item.url != '#' and request.path.startswith(item.url ~ '/')) %}
+            {% set item_has_active_child = false %}
+            {% for child in item.children %}
+                {% if request.path == child.url or (child.url and child.url != '#' and request.path.startswith(child.url ~ '/')) %}
+                    {% set item_has_active_child = true %}
+                {% endif %}
+            {% endfor %}
+            <li class="app-sidebar__item has-submenu {% if item.children %}has-submenu{% endif %} {% if item_is_active or item_has_active_child %}open{% endif %}">
+                {% if item.children %}
+                <button type="button" class="app-sidebar__link app-sidebar__submenu-toggle {% if item_is_active or item_has_active_child %}active{% endif %}" data-sidebar-menu="{{ item.name|lower|replace(' ', '_') }}" aria-expanded="{% if item_is_active or item_has_active_child %}true{% else %}false{% endif %}">
+                    <i class="fa {{ item.icon_name }}"></i>
+                    <span>{{ item.name }}</span>
+                    <i class="fa fa-chevron-down app-sidebar__chevron"></i>
+                </button>
+                <ul class="app-sidebar__submenu">
+                    {% for child in item.children %}
+                    {% set child_is_active = request.path == child.url or (child.url and child.url != '#' and request.path.startswith(child.url ~ '/')) %}
+                    <li>
+                        <a class="app-sidebar__link sidebar-link {% if child_is_active %}active{% endif %}" href="{{ child.url }}" data-search-text="{{ item.name|lower }} {{ child.name|lower }}">
+                            <i class="fa {{ child.icon_name }}"></i>
+                            <span>{{ child.name }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <a class="app-sidebar__link sidebar-link {% if item_is_active %}active{% endif %}" href="{{ item.url }}" data-search-text="{{ item.name|lower }}">
+                    <i class="fa {{ item.icon_name }}"></i>
+                    <span>{{ item.name }}</span>
+                </a>
+                {% endif %}
+            </li>
+            {% endfor %}
+
+            {% if role in ['admin', 'administrator', 'system_admin'] %}
+            <li class="app-sidebar__item has-submenu {% if endpoint in ['admin_users', 'admin_edit_user'] %}open{% endif %}">
+                <button type="button" class="app-sidebar__link app-sidebar__submenu-toggle {% if endpoint in ['admin_users', 'admin_edit_user'] %}active{% endif %}" data-sidebar-menu="admin" aria-expanded="{% if endpoint in ['admin_users', 'admin_edit_user'] %}true{% else %}false{% endif %}">
+                    <i class="fa fa-shield-halved"></i>
+                    <span>Admin</span>
+                    <i class="fa fa-chevron-down app-sidebar__chevron"></i>
+                </button>
+                <ul class="app-sidebar__submenu">
+                    <li>
+                        <a class="app-sidebar__link sidebar-link {% if endpoint in ['admin_users', 'admin_edit_user'] %}active{% endif %}" href="{{ url_for('admin_users') }}" data-search-text="admin users user management">
+                            <i class="fa fa-users"></i>
+                            <span>Users</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            {% endif %}
+
+            <li class="app-sidebar__item has-submenu {% if endpoint in ['settings', 'root_menu', 'sub_menu', 'profile', 'select_branch'] %}open{% endif %}">
+                <button type="button" class="app-sidebar__link app-sidebar__submenu-toggle {% if endpoint in ['settings', 'root_menu', 'sub_menu', 'profile', 'select_branch'] %}active{% endif %}" data-sidebar-menu="settings" aria-expanded="{% if endpoint in ['settings', 'root_menu', 'sub_menu', 'profile', 'select_branch'] %}true{% else %}false{% endif %}">
+                    <i class="fa fa-gear"></i>
+                    <span>Settings</span>
+                    <i class="fa fa-chevron-down app-sidebar__chevron"></i>
+                </button>
+                <ul class="app-sidebar__submenu">
+                    <li class="app-sidebar__item has-submenu {% if endpoint in ['settings', 'root_menu', 'sub_menu'] %}open{% endif %}">
+                        <button type="button" class="app-sidebar__link app-sidebar__submenu-toggle {% if endpoint in ['settings', 'root_menu', 'sub_menu'] %}active{% endif %}" data-sidebar-menu="system" aria-expanded="{% if endpoint in ['settings', 'root_menu', 'sub_menu'] %}true{% else %}false{% endif %}">
+                            <i class="fa fa-sliders"></i>
+                            <span>System</span>
+                            <i class="fa fa-chevron-down app-sidebar__chevron"></i>
+                        </button>
+                        <ul class="app-sidebar__submenu">
+                            <li>
+                                <a class="app-sidebar__link sidebar-link {% if endpoint == 'settings' %}active{% endif %}" href="{{ url_for('settings') }}" data-search-text="settings system general">
+                                    <i class="fa fa-gears"></i>
+                                    <span>General</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="app-sidebar__link sidebar-link {% if endpoint == 'root_menu' %}active{% endif %}" href="{{ url_for('root_menu') }}" data-search-text="settings system root menu">
+                                    <i class="fa fa-sitemap"></i>
+                                    <span>Root Menu</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="app-sidebar__link sidebar-link {% if endpoint == 'sub_menu' %}active{% endif %}" href="{{ url_for('sub_menu') }}" data-search-text="settings system sub menu">
+                                    <i class="fa fa-list"></i>
+                                    <span>Sub Menu</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a class="app-sidebar__link sidebar-link {% if endpoint == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}" data-search-text="profile account">
+                            <i class="fa fa-id-card"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    {% if role in ['admin', 'administrator', 'system_admin'] %}
+                    <li>
+                        <a class="app-sidebar__link sidebar-link {% if endpoint == 'select_branch' %}active{% endif %}" href="{{ url_for('select_branch') }}" data-search-text="branch select branch">
+                            <i class="fa fa-code-branch"></i>
+                            <span>Branch</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </li>
+            <li>
+                <a class="app-sidebar__link sidebar-link" href="{{ url_for('logout') }}" data-search-text="logout sign out">
+                    <i class="fa fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="app-sidebar__footer" aria-label="Application version and vendor">
+        <div class="app-sidebar__version">v1.0</div>
+        <div class="app-sidebar__footer-text">
+            <strong>Site Version - 1.0</strong>
+            <span>Pro Infotech</span>
+        </div>
+    </div>
+</aside>
+<footer class="app-page-credit" aria-label="Developer credit">
+    Designed and Developed by Pro Infotech
+</footer>

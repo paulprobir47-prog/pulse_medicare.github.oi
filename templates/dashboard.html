@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pulse Medicare Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root {
+    color-scheme: light;
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --surface-alt: #f8fbff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #0f766e;
+    --primary-deep: #0b8f84;
+    --primary-soft: #ccfbf1;
+    --accent: #2563eb;
+    --accent-deep: #1d4ed8;
+    --success: #22c55e;
+    --success-deep: #15803d;
+    --danger: #ef4444;
+    --danger-deep: #b91c1c;
+    --sidebar: #064e47;
+    --sidebar-hover: #0d7666;
+    --panel-gradient: linear-gradient(135deg, rgba(15,118,110,0.12), var(--surface));
+    --panel-border: rgba(15,118,110,0.16);
+    --border: rgba(15,23,42,0.08);
+    --shadow: 0 24px 80px rgba(15,23,42,0.08);
+}
+
+html[data-dashboard-theme="navy"] {
+    --bg: #edf4fb;
+    --surface: #ffffff;
+    --surface-alt: #f5f8fc;
+    --text: #102033;
+    --muted: #5b6b7d;
+    --primary: #1d4ed8;
+    --primary-deep: #1e3a8a;
+    --primary-soft: #dbeafe;
+    --accent: #0f766e;
+    --accent-deep: #115e59;
+    --success: #16a34a;
+    --success-deep: #166534;
+    --danger: #dc2626;
+    --danger-deep: #991b1b;
+    --sidebar: #102a43;
+    --sidebar-hover: #1d4ed8;
+    --panel-gradient: linear-gradient(135deg, rgba(29,78,216,0.11), var(--surface));
+    --panel-border: rgba(29,78,216,0.18);
+    --border: rgba(16,32,51,0.1);
+    --shadow: 0 24px 80px rgba(16,32,51,0.1);
+}
+
+html[data-dashboard-theme="emerald"] {
+    --bg: #eef8f3;
+    --surface: #ffffff;
+    --surface-alt: #f5fbf8;
+    --text: #10251b;
+    --muted: #52665c;
+    --primary: #047857;
+    --primary-deep: #065f46;
+    --primary-soft: #d1fae5;
+    --accent: #0ea5e9;
+    --accent-deep: #0369a1;
+    --success: #22c55e;
+    --success-deep: #15803d;
+    --danger: #e11d48;
+    --danger-deep: #9f1239;
+    --sidebar: #064e3b;
+    --sidebar-hover: #047857;
+    --panel-gradient: linear-gradient(135deg, rgba(4,120,87,0.12), var(--surface));
+    --panel-border: rgba(4,120,87,0.17);
+}
+
+html[data-dashboard-theme="royal"] {
+    --bg: #f2f4fb;
+    --surface: #ffffff;
+    --surface-alt: #f7f8fd;
+    --text: #1f2333;
+    --muted: #626b80;
+    --primary: #6d28d9;
+    --primary-deep: #4c1d95;
+    --primary-soft: #ede9fe;
+    --accent: #0891b2;
+    --accent-deep: #155e75;
+    --success: #16a34a;
+    --success-deep: #166534;
+    --danger: #dc2626;
+    --danger-deep: #991b1b;
+    --sidebar: #312e81;
+    --sidebar-hover: #6d28d9;
+    --panel-gradient: linear-gradient(135deg, rgba(109,40,217,0.1), var(--surface));
+    --panel-border: rgba(109,40,217,0.16);
+}
+
+html[data-dashboard-theme="sunrise"] {
+    --bg: #f8f4ee;
+    --surface: #ffffff;
+    --surface-alt: #fffaf3;
+    --text: #2a2118;
+    --muted: #716457;
+    --primary: #b45309;
+    --primary-deep: #92400e;
+    --primary-soft: #ffedd5;
+    --accent: #0f766e;
+    --accent-deep: #115e59;
+    --success: #15803d;
+    --success-deep: #166534;
+    --danger: #b91c1c;
+    --danger-deep: #7f1d1d;
+    --sidebar: #3b2f2f;
+    --sidebar-hover: #b45309;
+    --panel-gradient: linear-gradient(135deg, rgba(180,83,9,0.11), var(--surface));
+    --panel-border: rgba(180,83,9,0.16);
+}
+
+html[data-dashboard-theme="midnight"],
+body.dark {
+    color-scheme: dark;
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-alt: #111b2d;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --primary-deep: #0f766e;
+    --primary-soft: rgba(45,212,191,0.18);
+    --accent: #60a5fa;
+    --accent-deep: #2563eb;
+    --success: #34d399;
+    --success-deep: #059669;
+    --danger: #fb7185;
+    --danger-deep: #e11d48;
+    --sidebar: #071821;
+    --sidebar-hover: #10263c;
+    --panel-gradient: linear-gradient(135deg, rgba(45,212,191,0.1), var(--surface));
+    --panel-border: rgba(45,212,191,0.18);
+    --border: rgba(148,163,184,0.22);
+    --shadow: 0 24px 80px rgba(0,0,0,0.44);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 80px;
+    height: 100vh;
+    max-height: 100vh;
+    background: var(--sidebar);
+    position: fixed;
+    left: 0;
+    top: 0;
+    color: white;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.35) transparent;
+    -webkit-overflow-scrolling: touch;
+    transition: width 0.25s ease;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.sidebar:hover {
+    width: 250px;
+}
+
+.logo {
+    text-align: center;
+    padding: 30px 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.logo i {
+    font-size: 64px;
+    margin-bottom: 12px;
+}
+
+.logo h2 {
+    margin-bottom: 6px;
+    font-size: 24px;
+    letter-spacing: 0.06em;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.25s ease, max-height 0.25s ease;
+}
+
+.logo p {
+    font-size: 14px;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.25s ease, max-height 0.25s ease;
+}
+
+.sidebar:hover .logo h2,
+.sidebar:hover .logo p {
+    opacity: 1;
+    max-height: 100px;
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sidebar:not(:hover) .logo{padding:18px 0;}
+.sidebar:not(:hover) .logo h2,
+.sidebar:not(:hover) .logo p{opacity:0;max-height:0;margin:0;padding:0;visibility:hidden;}
+.sidebar:not(:hover) .logo i{margin:0 auto;font-size:30px;}
+.sidebar:not(:hover) ul li a{
+    justify-content: center;
+    gap: 0;
+    padding: 16px 0;
+    width: 100%;
+    min-height: 48px;
+    font-size: 0;
+    line-height: 1;
+    overflow: visible;
+}
+.sidebar:not(:hover) ul li a i {
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar-search {
+        margin: 18px 16px 8px;
+        position: relative;
+    }
+
+    .sidebar-search input {
+        width: 100%;
+        padding: 10px 12px 10px 38px;
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.12);
+        color: white;
+        outline: none;
+    }
+
+    .sidebar-search input::placeholder {
+        color: rgba(255,255,255,0.72);
+    }
+
+    .sidebar-search i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255,255,255,0.74);
+    }
+
+    .sidebar-search-results {
+        display: none;
+        margin: 8px 16px 0;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.12);
+        overflow: hidden;
+    }
+
+    .sidebar-search-results.show {
+        display: block;
+    }
+
+    .sidebar-search-result {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .sidebar-search-result:hover {
+        background: rgba(255,255,255,0.16);
+    }
+
+    .sidebar-search-hint {
+        margin: 6px 16px 0;
+        font-size: 12px;
+        color: rgba(255,255,255,0.72);
+    }
+
+    .sidebar ul {
+        list-style: none;
+        margin-top: 10px;
+}
+
+.sidebar ul li {
+    padding: 14px 25px;
+    transition: background 0.25s ease;
+}
+
+.sidebar ul li:hover {
+    background: var(--sidebar-hover);
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+}
+
+    .sidebar .menu-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .sidebar .menu-toggle {
+        flex: 1;
+    }
+
+    .sidebar .submenu-arrow {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 2px 4px;
+    }
+
+    .sidebar ul li .submenu {
+        display: none;
+        list-style: none;
+        padding-left: 24px;
+        margin-top: 8px;
+    }
+
+    .sidebar ul li.open > .submenu {
+        display: block;
+    }
+
+/* Main */
+.main {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+    min-height: 100vh;
+    padding-bottom: 40px;
+    transition: margin-left 0.25s ease, width 0.25s ease;
+}
+
+.sidebar:hover ~ .main {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+}
+
+/* Topbar */
+.topbar {
+    height: 80px;
+    background: var(--surface);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.search {
+    position: relative;
+}
+
+.search input {
+    width: 320px;
+    padding: 12px 16px 12px 44px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    outline: none;
+    background: var(--surface-alt);
+    color: var(--text);
+}
+
+.search i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.profile i {
+    font-size: 32px;
+    color: var(--primary);
+}
+
+.profile-dropdown {
+    position: relative;
+}
+
+.profile-toggle {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    border-radius: 999px;
+    padding: 10px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.profile-toggle:hover,
+.profile-toggle:focus-visible {
+    background: var(--primary-soft);
+    transform: translateY(-1px);
+}
+
+.profile-avatar,
+.profile-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border);
+}
+
+.profile-icon {
+    font-size: 22px;
+}
+
+.profile-label {
+    font-weight: 700;
+}
+
+.profile-caret {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.profile-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    min-width: 180px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-12px);
+    visibility: hidden;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    z-index: 20;
+}
+
+.profile-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.profile-menu-item:hover {
+    background: var(--surface-alt);
+}
+
+.profile-menu-item i {
+    width: 18px;
+    text-align: center;
+}
+
+.theme-toggle {
+    border: 1px solid var(--border);
+    background: var(--surface-alt);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-1px);
+    background: var(--primary-soft);
+}
+
+.theme-selector {
+    position: relative;
+}
+
+.theme-toggle .theme-name {
+    font-weight: 800;
+}
+
+.theme-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    width: 250px;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(-12px);
+    visibility: hidden;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    z-index: 30;
+}
+
+.theme-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.theme-option {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+.theme-option:hover,
+.theme-option.active {
+    background: var(--primary-soft);
+}
+
+.theme-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex: 0 0 auto;
+    background: linear-gradient(135deg, var(--swatch-a), var(--swatch-b));
+}
+
+.theme-option-title {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.theme-option-note {
+    display: block;
+    margin-top: 1px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.theme-check {
+    margin-left: auto;
+    color: var(--primary);
+    opacity: 0;
+}
+
+.theme-option.active .theme-check {
+    opacity: 1;
+}
+.notification-btn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    border-radius: 999px;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1;
+}
+
+.notification-btn:hover {
+    transform: translateY(-1px);
+    background: var(--primary-soft);
+}
+.notification-btn.seen {
+    opacity: 0.75;
+    background: rgba(255, 255, 255, 0.08);
+}
+.notification-btn.seen .notification-badge {
+    display: none;
+}
+.notification-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Cards */
+.collection-section {
+    padding: 24px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.collection-card,
+.booking-card,
+.confirm-card,
+.cancel-card {
+    position: relative;
+    color: white;
+    padding: 24px 28px;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    min-width: 240px;
+    flex: 1;
+    max-width: 300px;
+    transform: translateY(0) scale(1);
+    transform-origin: center;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    will-change: transform;
+}
+
+.collection-card:hover,
+.booking-card:hover,
+.confirm-card:hover,
+.cancel-card:hover,
+.collection-card:focus-within,
+.booking-card:focus-within,
+.confirm-card:focus-within,
+.cancel-card:focus-within {
+    z-index: 2;
+    transform: translateY(-4px) scale(1.025);
+    box-shadow: 0 22px 60px rgba(15, 23, 42, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .collection-card,
+    .booking-card,
+    .confirm-card,
+    .cancel-card {
+        transition: none;
+    }
+
+    .collection-card:hover,
+    .booking-card:hover,
+    .confirm-card:hover,
+    .cancel-card:hover,
+    .collection-card:focus-within,
+    .booking-card:focus-within,
+    .confirm-card:focus-within,
+    .cancel-card:focus-within {
+        transform: none;
+    }
+}
+
+.collection-card {
+    background: linear-gradient(135deg, var(--primary), var(--primary-deep));
+}
+
+.booking-card {
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+}
+
+.confirm-card {
+    background: linear-gradient(135deg, var(--success), var(--success-deep));
+}
+
+.cancel-card {
+    background: linear-gradient(135deg, var(--danger), var(--danger-deep));
+}
+
+.collection-header,
+.booking-header,
+.confirm-header,
+.cancel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.collection-label,
+.booking-label,
+.confirm-label,
+.cancel-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}
+
+.collection-amount,
+.booking-count,
+.confirm-count,
+.cancel-count {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.view-report,
+.new-booking,
+.confirm-link,
+.cancel-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    padding-top: 4px;
+}
+
+.view-report:hover,
+.new-booking:hover,
+.confirm-link:hover,
+.cancel-link:hover {
+    text-decoration: underline;
+}
+
+.dashboard-content-grid {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+    margin: 24px 24px 24px 0;
+    flex-wrap: wrap;
+}
+
+.payment-due-section {
+    padding: 24px;
+    background: var(--panel-gradient);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--panel-border);
+    width: 100%;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.sales-chart-section {
+    padding: 24px;
+    background: var(--surface);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    min-width: 280px;
+    flex: 0 1 360px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sales-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.sales-chip {
+    background: linear-gradient(135deg, var(--primary), var(--success));
+    color: white;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.sales-chart-card {
+    background: var(--panel-gradient);
+    border-radius: 18px;
+    padding: 14px;
+}
+
+.sales-chart-card svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.sales-chart-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.sales-chart-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sales-chart-legend i {
+    font-size: 0.7rem;
+}
+
+.payment-due-header,
+.collection-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.section-eyebrow {
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.payment-due-title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text);
+}
+
+.period-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.period-dropdown {
+    position: relative;
+}
+
+.period-toggle {
+    border: 1px solid var(--panel-border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 600;
+    outline: none;
+    min-width: 160px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.period-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--surface);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    min-width: 100%;
+    display: none;
+    z-index: 30;
+    overflow: hidden;
+}
+
+.period-menu.show {
+    display: block;
+}
+
+.period-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.period-option:hover,
+.period-option.active {
+    background: var(--primary-soft);
+}
+
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding: 0 24px 24px;
+}
+
+.report-card {
+    padding: 24px;
+    background: var(--panel-gradient);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.collection-list-section {
+    padding: 24px;
+    background: var(--panel-gradient);
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--panel-border);
+    width: 100%;
+    max-width: 100%;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.collection-list-table {
+    padding: 0;
+    overflow: hidden;
+}
+
+.payment-due-table {
+    padding: 0;
+    overflow: hidden;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    padding: 25px;
+}
+
+.card {
+    background: var(--surface);
+    padding: 28px;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-soft);
+}
+
+.card i {
+    font-size: 40px;
+    color: var(--primary);
+}
+
+.card h2 {
+    margin-top: 18px;
+    font-size: 32px;
+}
+
+.card p {
+    margin-top: 10px;
+    color: var(--muted);
+}
+
+.panel {
+    background: var(--surface);
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+}
+
+.panel-title {
+    color: var(--primary);
+    margin-bottom: 14px;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.action-card {
+    background: var(--surface);
+    border-radius: 22px;
+    padding: 28px 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid transparent;
+    color: var(--text);
+    text-align: center;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-soft);
+}
+
+.action-card i {
+    color: var(--primary);
+    font-size: 26px;
+    margin-bottom: 14px;
+}
+
+.action-card h3 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.table-box {
+    background: var(--surface);
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.table-box table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-box th,
+.table-box td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    color: var(--text);
+}
+
+.table-box th {
+    background: var(--primary);
+    color: white;
+    font-weight: 600;
+}
+
+.table-box tr:last-child td {
+    border-bottom: none;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.status-paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background: #ffedd5;
+    color: #b45309;
+}
+
+.status-due {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.status-completed {
+    background: #ecfdf5;
+    color: #166534;
+}
+
+.status-confirmed {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.footer {
+    margin-top: 30px;
+    padding: 20px;
+    text-align: center;
+    color: var(--muted);
+}
+
+@media(max-width:1000px) {
+    .cards,
+    .action-grid,
+    .report-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-content-grid {
+        margin-right: 24px;
+    }
+
+    .topbar {
+        height: auto;
+        min-height: 80px;
+        padding: 14px 20px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .topbar-actions {
+        margin-left: 0 !important;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}
+
+@media(max-width:700px) {
+    .report-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        width: 80px;
+    }
+
+    .logo h2,
+    .logo p {
+        display: none;
+    }
+
+    .sidebar ul li {
+        padding: 14px 18px;
+    }
+
+    .sidebar ul li a {
+        font-size: 0;
+    }
+
+    .sidebar ul li i {
+        font-size: 22px;
+        width: auto;
+    }
+
+    .main {
+        margin-left: 80px;
+        width: calc(100% - 80px);
+    }
+
+    .topbar {
+        align-items: flex-start;
+    }
+
+    .topbar-left,
+    .topbar-actions {
+        width: 100%;
+    }
+
+    .topbar-actions {
+        justify-content: flex-start;
+        gap: 10px !important;
+    }
+
+    .theme-selector,
+    .theme-toggle,
+    .notification-btn,
+    .profile-dropdown,
+    .profile-toggle {
+        max-width: 100%;
+    }
+
+    .theme-menu {
+        left: 0;
+        right: auto;
+        width: min(250px, calc(100vw - 116px));
+    }
+
+    .search input {
+        width: 180px;
+    }
+
+    .cards,
+    .action-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+    (function () {
+        const validThemes = ['clinical', 'navy', 'emerald', 'royal', 'midnight'];
+        const storedTheme = localStorage.getItem('dashboardTheme') || 'clinical';
+        const theme = storedTheme === 'dark' ? 'midnight' : storedTheme;
+        document.documentElement.setAttribute('data-dashboard-theme', validThemes.includes(theme) ? theme : 'clinical');
+    })();
+</script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+
+<body>
+
+{% include '_sidebar.html' %}
+<div class="main">
+
+<div class="topbar">
+
+<div class="topbar-left" style="display:flex; align-items:center; gap:12px;">
+    <div style="display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid var(--border); border-radius:999px; background:var(--surface-alt); color:var(--text); font-weight:700;">
+        <i class="fa fa-building"></i>
+        <span>{{ session.get('branch') or 'Main Branch' }}</span>
+    </div>
+</div>
+
+    <div class="topbar-actions" style="margin-left:auto; display:flex; align-items:center; gap:14px;">
+<div class="theme-selector">
+    <button type="button" id="themeToggle" class="theme-toggle" aria-expanded="false" aria-haspopup="true">
+
+        <i class="fa fa-palette"></i>
+        <span class="theme-name">Clinical Teal</span>
+        <i class="fa fa-chevron-down"></i>
+    </button>
+    <div class="theme-menu" id="themeMenu" aria-labelledby="themeToggle">
+        <button type="button" class="theme-option" data-theme-option="clinical">
+            <span class="theme-swatch" style="--swatch-a:#0f766e;--swatch-b:#2563eb;"></span>
+            <span><span class="theme-option-title">Clinical Teal</span><span class="theme-option-note">Clean HMS default</span></span>
+            <i class="fa fa-check theme-check"></i>
+        </button>
+        <button type="button" class="theme-option" data-theme-option="navy">
+            <span class="theme-swatch" style="--swatch-a:#102a43;--swatch-b:#1d4ed8;"></span>
+            <span><span class="theme-option-title">Navy Care</span><span class="theme-option-note">Professional admin blue</span></span>
+            <i class="fa fa-check theme-check"></i>
+        </button>
+        <button type="button" class="theme-option" data-theme-option="emerald">
+            <span class="theme-swatch" style="--swatch-a:#047857;--swatch-b:#0ea5e9;"></span>
+            <span><span class="theme-option-title">Emerald Ward</span><span class="theme-option-note">Fresh hospital green</span></span>
+            <i class="fa fa-check theme-check"></i>
+        </button>
+        <button type="button" class="theme-option" data-theme-option="royal">
+            <span class="theme-swatch" style="--swatch-a:#6d28d9;--swatch-b:#0891b2;"></span>
+            <span><span class="theme-option-title">Royal Clinic</span><span class="theme-option-note">Modern specialist look</span></span>
+            <i class="fa fa-check theme-check"></i>
+        </button>
+        <button type="button" class="theme-option" data-theme-option="midnight">
+            <span class="theme-swatch" style="--swatch-a:#071821;--swatch-b:#2dd4bf;"></span>
+            <span><span class="theme-option-title">Midnight HMS</span><span class="theme-option-note">Dark control room</span></span>
+            <i class="fa fa-check theme-check"></i>
+        </button>
+    </div>
+</div>
+<button type="button" class="notification-btn"><i class="fa fa-bell"></i><span class="notification-badge">3</span></button>
+
+<div class="profile-dropdown">
+    <button type="button" id="profileToggle" class="profile-toggle" aria-expanded="false" onclick="toggleDashboardProfileMenu(event)">
+        {% if profile_photo %}
+        <img src="/{{ profile_photo }}" alt="Profile" class="profile-avatar">
+        {% else %}
+        <i class="fa fa-user-circle profile-icon"></i>
+        {% endif %}
+        <span class="profile-label">{{ display_name or username }}</span>
+        <i class="fa fa-chevron-down profile-caret"></i>
+    </button>
+    <div class="profile-menu" id="profileMenu" aria-labelledby="profileToggle">
+        <a class="profile-menu-item" href="/profile"><i class="fa fa-user"></i> View Profile</a>
+        <a class="profile-menu-item" href="{{ url_for('logout') }}"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    </div>
+</div>
+</div>
+
+</div>
+
+<div class="collection-section">
+    <div class="collection-card">
+        <div class="collection-header">
+            <div>
+                <p class="collection-label">TODAY'S COLLECTION</p>
+                <h2 class="collection-amount">₹ {{ revenue }}</h2>
+            </div>
+            <a href="/reports" class="view-report">View Report</a>
+        </div>
+    </div>
+
+    <div class="booking-card">
+        <div class="booking-header">
+            <div>
+                <p class="booking-label">TODAY'S TOTAL BOOKINGS</p>
+                <h2 class="booking-count"><i class="fa fa-user-injured"></i> {{ today_bookings }}</h2>
+            </div>
+            <a href="/appointments" class="new-booking">New Booking</a>
+        </div>
+    </div>
+
+    <div class="confirm-card">
+        <div class="confirm-header">
+            <div>
+                <p class="confirm-label">TODAY'S CONFIRM BOOKINGS</p>
+                <h2 class="confirm-count"><i class="fa fa-check-circle"></i> {{ today_confirmed_bookings }}</h2>
+            </div>
+            <a href="/appointments" class="confirm-link">View</a>
+        </div>
+    </div>
+
+    <div class="cancel-card">
+        <div class="cancel-header">
+            <div>
+                <p class="cancel-label">TODAY'S CANCEL BOOKINGS</p>
+                <h2 class="cancel-count"><i class="fa fa-times-circle"></i> {{ today_cancelled_bookings }}</h2>
+            </div>
+            <a href="/appointments" class="cancel-link">View</a>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-content-grid">
+    <section class="payment-due-section">
+        <div class="payment-due-header">
+            <div>
+                <p class="section-eyebrow">PAYMENT TRACKING</p>
+                <h3 class="payment-due-title">LIST PATIENT WISE PAYMENT IS DUE</h3>
+            </div>
+            <div class="period-filter">
+                <label for="paymentPeriod" style="margin-right:8px; font-weight:700; color:var(--text);">FILTER BY PERIOD:</label>
+                <div class="period-dropdown">
+                    <button type="button" class="period-toggle" id="periodToggle" aria-haspopup="listbox" aria-expanded="false">
+                        Today <i class="fa fa-chevron-down"></i>
+                    </button>
+                    <div class="period-menu" id="periodMenu" role="listbox">
+                        <button type="button" class="period-option active" data-value="Today">Today</button>
+                        <button type="button" class="period-option" data-value="Yesterday">Yesterday</button>
+                        <button type="button" class="period-option" data-value="Last 7 Days">Last 7 Days</button>
+                        <button type="button" class="period-option" data-value="Last 30 Days">Last 30 Days</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-box payment-due-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Amount Due</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="text-align:center; color:var(--muted);">No payment dues found for this period.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="sales-chart-section">
+        <div class="sales-chart-header">
+            <div>
+                <p class="section-eyebrow">SALES TRACK</p>
+                <h3 class="payment-due-title">SALE TRACKING</h3>
+            </div>
+            <span class="sales-chip">+12.8%</span>
+        </div>
+
+        <div class="sales-chart-card">
+            <svg viewBox="0 0 320 180" role="img" aria-label="Sales tracking bar chart">
+                <rect x="28" y="95" width="36" height="55" rx="8" fill="#0f766e"></rect>
+                <rect x="92" y="70" width="36" height="80" rx="8" fill="#14b8a6"></rect>
+                <rect x="156" y="48" width="36" height="102" rx="8" fill="#22c55e"></rect>
+                <rect x="220" y="80" width="36" height="70" rx="8" fill="#0ea5e9"></rect>
+                <rect x="284" y="30" width="36" height="120" rx="8" fill="#3b82f6"></rect>
+                <line x1="20" y1="160" x2="320" y2="160" stroke="#cbd5e1" stroke-width="1"></line>
+            </svg>
+        </div>
+
+        <div class="sales-chart-legend">
+            <span><i class="fa fa-square" style="color:#0f766e"></i> Jan</span>
+            <span><i class="fa fa-square" style="color:#14b8a6"></i> Feb</span>
+            <span><i class="fa fa-square" style="color:#22c55e"></i> Mar</span>
+        </div>
+    </section>
+</div>
+
+{% if is_admin %}
+<div class="report-grid">
+    <section class="report-card payment-due-section">
+        <div class="payment-due-header">
+            <div>
+                <p class="section-eyebrow">PAYMENT TRACKING</p>
+                <h3 class="payment-due-title">Patient-wise Payment Due</h3>
+            </div>
+        </div>
+
+        <div class="table-box payment-due-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Amount Due</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if payment_dues %}
+                        {% for item in payment_dues %}
+                            <tr>
+                                <td>{{ item.patient_name or 'Unknown Patient' }}</td>
+                                <td>₹ {{ "%.2f"|format(item.amount_due or 0) }}</td>
+                                <td>{{ item.due_date }}</td>
+                                <td><span class="status-pill status-pending">{{ item.status or 'Pending' }}</span></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align:center; color:var(--muted);">No payment dues found for this period.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="report-card collection-list-section">
+        <div class="collection-list-header">
+            <div>
+                <p class="section-eyebrow">COLLECTIONS</p>
+                <h3 class="payment-due-title">List of Collection</h3>
+            </div>
+        </div>
+
+        <div class="table-box collection-list-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient Name</th>
+                        <th>Collection Amount</th>
+                        <th>Collected On</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if collections %}
+                        {% for item in collections %}
+                            <tr>
+                                <td>{{ item.patient_name or 'Unknown Patient' }}</td>
+                                <td>₹ {{ "%.2f"|format(item.collection_amount or 0) }}</td>
+                                <td>{{ item.collected_on }}</td>
+                                <td><span class="status-pill status-paid">{{ item.status or 'Paid' }}</span></td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align:center; color:var(--muted);">No collection records found for this period.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% else %}
+<div class="report-grid">
+    <section class="report-card payment-due-section" style="width:100%;">
+        <div class="payment-due-header">
+            <div>
+                <p class="section-eyebrow">WELCOME</p>
+                <h3 class="payment-due-title">Hello {{ display_name or username }}</h3>
+            </div>
+        </div>
+        <div style="padding:24px; color:var(--muted);">
+            <p>Welcome to Pulse Medicare. Your account has been authenticated successfully.</p>
+            <p>Use the sidebar to access patients, appointments, billing, laboratory, and profile options.</p>
+            <p>If you need admin access, please contact your system administrator.</p>
+        </div>
+    </section>
+</div>
+{% endif %}
+
+<script>
+    function toggleDashboardProfileMenu(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const button = document.getElementById('profileToggle');
+        const menu = document.getElementById('profileMenu');
+        if (!button || !menu) return;
+        const isOpen = menu.classList.toggle('show');
+        button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    document.addEventListener('click', function (event) {
+        const button = document.getElementById('profileToggle');
+        const menu = document.getElementById('profileMenu');
+        if (!button || !menu) return;
+        if (!button.contains(event.target) && !menu.contains(event.target)) {
+            menu.classList.remove('show');
+            button.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    const themeToggle = document.getElementById('themeToggle');
+    const themeMenu = document.getElementById('themeMenu');
+    const themeName = themeToggle ? themeToggle.querySelector('.theme-name') : null;
+    const themeOptions = Array.from(document.querySelectorAll('[data-theme-option]'));
+    const body = document.body;
+    const dashboardThemes = {
+        clinical: { label: 'Clinical Teal', icon: 'fa-palette' },
+        navy: { label: 'Navy Care', icon: 'fa-shield-heart' },
+        emerald: { label: 'Emerald Ward', icon: 'fa-leaf' },
+        royal: { label: 'Royal Clinic', icon: 'fa-star-of-life' },
+        midnight: { label: 'Midnight HMS', icon: 'fa-moon' }
+    };
+    const notificationBtn = document.querySelector('.notification-btn');
+    const notificationBadge = notificationBtn ? notificationBtn.querySelector('.notification-badge') : null;
+
+    function normalizeDashboardTheme(theme) {
+        if (theme === 'dark') {
+            return 'midnight';
+        }
+        return dashboardThemes[theme] ? theme : 'clinical';
+    }
+
+    function applyTheme(theme) {
+        const normalizedTheme = normalizeDashboardTheme(theme);
+        const themeMeta = dashboardThemes[normalizedTheme];
+        document.documentElement.setAttribute('data-dashboard-theme', normalizedTheme);
+        body.classList.toggle('dark', normalizedTheme === 'midnight');
+        localStorage.setItem('dashboardTheme', normalizedTheme);
+
+        if (themeName) {
+            themeName.textContent = themeMeta.label;
+        }
+
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i:first-child');
+            if (icon) {
+                icon.className = 'fa ' + themeMeta.icon;
+            }
+        }
+
+        themeOptions.forEach((option) => {
+            const isActive = option.getAttribute('data-theme-option') === normalizedTheme;
+            option.classList.toggle('active', isActive);
+            option.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+    }
+
+    function setupThemeToggle() {
+        if (!themeToggle) return;
+        themeToggle.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!themeMenu) return;
+            const isOpen = themeMenu.classList.toggle('show');
+            themeToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        themeOptions.forEach((option) => {
+            option.addEventListener('click', (event) => {
+                event.stopPropagation();
+                applyTheme(option.getAttribute('data-theme-option'));
+                if (themeMenu) {
+                    themeMenu.classList.remove('show');
+                }
+                themeToggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!themeMenu || !themeToggle) return;
+            if (!themeToggle.contains(event.target) && !themeMenu.contains(event.target)) {
+                themeMenu.classList.remove('show');
+                themeToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    function setupNotificationButton() {
+        if (!notificationBtn) return;
+        notificationBtn.addEventListener('click', () => {
+            if (notificationBadge) {
+                notificationBadge.style.display = 'none';
+            }
+            notificationBtn.classList.add('seen');
+            notificationBtn.setAttribute('aria-label', 'Notifications seen');
+        });
+    }
+
+    function setupProfileMenu() {
+        const profileToggle = document.getElementById('profileToggle');
+        const profileMenu = document.getElementById('profileMenu');
+        if (!profileToggle || !profileMenu) return;
+
+        profileToggle.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            const isOpen = profileMenu.classList.toggle('show');
+            profileToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!profileToggle.contains(event.target) && !profileMenu.contains(event.target)) {
+                profileMenu.classList.remove('show');
+                profileToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    function setupSidebarSearch() {
+        const sidebarSearchInput = document.getElementById('sidebarSearchInput');
+        const sidebarSearchResults = document.getElementById('sidebarSearchResults');
+        const sidebarSearchHint = document.getElementById('sidebarSearchHint');
+        const sidebarLinks = Array.from(document.querySelectorAll('.sidebar-link'));
+        if (!sidebarSearchInput || !sidebarSearchResults || !sidebarSearchHint) return;
+
+        function renderSidebarSearchResults(query) {
+            const term = query.trim().toLowerCase();
+            if (!term) {
+                sidebarSearchResults.innerHTML = '';
+                sidebarSearchResults.classList.remove('show');
+                sidebarSearchHint.textContent = 'Type to filter menu items';
+                return;
+            }
+
+            const matches = sidebarLinks.filter((link) => {
+                const text = (link.getAttribute('data-search-text') || link.textContent).toLowerCase();
+                return text.includes(term);
+            });
+
+            if (!matches.length) {
+                sidebarSearchResults.innerHTML = '<div class="sidebar-search-result">No matching menu items</div>';
+                sidebarSearchResults.classList.add('show');
+                sidebarSearchHint.textContent = 'No matching menu items';
+                return;
+            }
+
+            sidebarSearchResults.innerHTML = matches.map((link) => {
+                const label = link.textContent.trim();
+                const iconClass = link.querySelector('i') ? link.querySelector('i').className : 'fa fa-arrow-right';
+                const resultHref = link.getAttribute('data-result-href') || link.getAttribute('href');
+                return `<a class="sidebar-search-result" href="${resultHref}"><i class="${iconClass}"></i><span>${label}</span></a>`;
+            }).join('');
+            sidebarSearchResults.classList.add('show');
+            sidebarSearchHint.textContent = `${matches.length} menu item${matches.length === 1 ? '' : 's'} found`;
+        }
+
+        sidebarSearchInput.addEventListener('input', (event) => {
+            renderSidebarSearchResults(event.target.value);
+        });
+    }
+
+    function setupSideMenuToggles() {
+        document.querySelectorAll('.menu-toggle, .submenu-arrow').forEach((toggle) => {
+            toggle.addEventListener('click', (event) => {
+                event.preventDefault();
+                const parent = toggle.closest('li');
+                if (!parent) return;
+                const isOpen = parent.classList.contains('open');
+                document.querySelectorAll('.admin-menu, .settings-menu').forEach((item) => {
+                    if (item !== parent) {
+                        item.classList.remove('open');
+                    }
+                });
+                parent.classList.toggle('open', !isOpen);
+            });
+        });
+    }
+
+    function setupPeriodMenus() {
+        const periodToggle = document.getElementById('periodToggle');
+        const periodMenu = document.getElementById('periodMenu');
+        const periodOptions = Array.from(document.querySelectorAll('.period-option'));
+        const collectionPeriodToggle = document.getElementById('collectionPeriodToggle');
+        const collectionPeriodMenu = document.getElementById('collectionPeriodMenu');
+        const collectionPeriodOptions = Array.from(document.querySelectorAll('#collectionPeriodMenu .period-option'));
+
+        function closePeriodMenu(toggle, menu) {
+            if (menu) {
+                menu.classList.remove('show');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        if (periodToggle && periodMenu) {
+            periodToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isOpen = periodMenu.classList.toggle('show');
+                periodToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+
+            periodOptions.forEach((option) => {
+                option.addEventListener('click', () => {
+                    document.querySelector('#periodMenu .period-option.active')?.classList.remove('active');
+                    option.classList.add('active');
+                    periodToggle.innerHTML = `${option.dataset.value} <i class="fa fa-chevron-down"></i>`;
+                    closePeriodMenu(periodToggle, periodMenu);
+                });
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!periodToggle.contains(event.target) && !periodMenu.contains(event.target)) {
+                    closePeriodMenu(periodToggle, periodMenu);
+                }
+            });
+        }
+
+        if (collectionPeriodToggle && collectionPeriodMenu) {
+            collectionPeriodToggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isOpen = collectionPeriodMenu.classList.toggle('show');
+                collectionPeriodToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+
+            collectionPeriodOptions.forEach((option) => {
+                option.addEventListener('click', () => {
+                    document.querySelector('#collectionPeriodMenu .period-option.active')?.classList.remove('active');
+                    option.classList.add('active');
+                    collectionPeriodToggle.innerHTML = `${option.dataset.value} <i class="fa fa-chevron-down"></i>`;
+                    closePeriodMenu(collectionPeriodToggle, collectionPeriodMenu);
+                });
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!collectionPeriodToggle.contains(event.target) && !collectionPeriodMenu.contains(event.target)) {
+                    closePeriodMenu(collectionPeriodToggle, collectionPeriodMenu);
+                }
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupSideMenuToggles();
+        setupSidebarSearch();
+        applyTheme(localStorage.getItem('dashboardTheme') || document.documentElement.getAttribute('data-dashboard-theme') || 'clinical');
+        setupThemeToggle();
+        setupNotificationButton();
+        setupProfileMenu();
+        setupPeriodMenus();
+
+        // Notification bell opens chat
+        const notificationBtn = document.querySelector('.notification-btn');
+        if (notificationBtn) {
+            notificationBtn.addEventListener('click', () => {
+                window.location.href = '/chat';
+            });
+        }
+    });
+
+</script>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

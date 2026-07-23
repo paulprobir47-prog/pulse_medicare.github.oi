@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --text: #102a43;
+            --muted: #627d98;
+            --primary: #0f766e;
+            --primary-dark: #115e59;
+            --border: #d9e2ec;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ecfeff, #f8fafc);
+            color: var(--text);
+        }
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .card {
+            width: min(980px, 100%);
+            background: var(--surface);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+        }
+        .left-panel {
+            background: linear-gradient(160deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .avatar-wrap {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.16);
+        }
+        .avatar-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .left-panel h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .left-panel p {
+            margin: 0;
+            color: rgba(255,255,255,0.85);
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            background: rgba(255,255,255,0.16);
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .right-panel {
+            padding: 32px;
+        }
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .top-row a {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .field.full {
+            grid-column: 1 / -1;
+        }
+        .field label {
+            font-weight: 700;
+            color: var(--text);
+        }
+        .field input,
+        .field textarea {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 14px;
+            background: #f9fbfd;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .password-field {
+            position: relative;
+        }
+        .password-field input {
+            padding-right: 44px;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .field input:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+        .field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .section-card {
+            margin-top: 22px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #f9fbfd;
+        }
+        .section-card h4 {
+            margin: 0 0 6px;
+            font-size: 16px;
+        }
+        .flash-stack {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .flash {
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .flash.success {
+            background: #ecfdf5;
+            color: #047857;
+        }
+        .flash.error {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .btn {
+            margin-top: 18px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(15, 118, 110, 0.16);
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        .hint {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+        @media (max-width: 860px) {
+            .card { grid-template-columns: 1fr; }
+            .left-panel { align-items: flex-start; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+    <div class="page">
+        <div class="card">
+            <div class="left-panel">
+                <div class="avatar-wrap">
+                    {% if user and user.profile_photo %}
+                        <img src="/{{ user.profile_photo }}" alt="Profile photo">
+                    {% else %}
+                        <i class="fa-solid fa-user" style="font-size:48px;"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h2>{{ (user.full_name if user and user.full_name else username) }}</h2>
+                    <p>{{ (user.email if user and user.email else 'Add your email to get started') }}</p>
+                </div>
+                <div class="badge"><i class="fa-solid fa-shield-halved"></i> {{ role or 'User' }}</div>
+                <p class="hint">Upload a clean photo and keep your account details up to date.</p>
+            </div>
+            <div class="right-panel">
+                <div class="top-row">
+                    <div>
+                        <h3 style="margin:0;">My Profile</h3>
+                        <p class="hint" style="margin:4px 0 0;">Manage personal details and account activity</p>
+                    </div>
+                    <a href="/dashboard"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+                </div>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-stack">
+                    {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+                <form method="post" enctype="multipart/form-data">
+                    <div class="form-grid">
+                        <div class="field full">
+                            <label for="profile_photo">Profile Photo</label>
+                            <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                            <div class="hint">PNG, JPG, or JPEG files are supported.</div>
+                        </div>
+                        <div class="field">
+                            <label for="full_name">Full Name</label>
+                            <input type="text" id="full_name" name="full_name" value="{{ user.full_name if user and user.full_name else '' }}" placeholder="Enter your full name">
+                        </div>
+                        <div class="field">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" value="{{ username }}" disabled>
+                        </div>
+                        <div class="field">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" value="{{ user.email if user and user.email else '' }}" placeholder="Enter email address">
+                        </div>
+                        <div class="field">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" id="phone" name="phone" value="{{ user.phone if user and user.phone else '' }}" placeholder="Enter phone number">
+                        </div>
+                        <div class="field full">
+                            <label for="bio">Short Bio</label>
+                            <textarea id="bio" name="bio" placeholder="Tell us a bit about yourself">{{ user.bio if user and user.bio else '' }}</textarea>
+                        </div>
+                    </div>
+                    <div class="section-card">
+                        <h4><i class="fa-solid fa-lock"></i> Change Password</h4>
+                        <p class="hint">Use this section to update your account password.</p>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="current_password">Current Password</label>
+                                <div class="password-field">
+                                    <input type="password" id="current_password" name="current_password" placeholder="Enter current password">
+                                    <button type="button" class="password-toggle" data-target="current_password" aria-label="Toggle current password visibility"><i class="fa fa-eye"></i></button>
+                                </div>
+                            </div>
+                            <div class="field"></div>
+                            <div class="field">
+                                <label for="new_password">New Password</label>
+                                <div class="password-field">
+                                    <input type="password" id="new_password" name="new_password" placeholder="Enter new password">
+                                    <button type="button" class="password-toggle" data-target="new_password" aria-label="Toggle new password visibility"><i class="fa fa-eye"></i></button>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label for="confirm_password">Confirm Password</label>
+                                <div class="password-field">
+                                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password">
+                                    <button type="button" class="password-toggle" data-target="confirm_password" aria-label="Toggle confirm password visibility"><i class="fa fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+<script>
+    document.querySelectorAll('.password-toggle').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.className = isPassword ? 'fa fa-eye-slash' : 'fa fa-eye';
+            }
+        });
+    });
+</script>
+</body>
+</html>

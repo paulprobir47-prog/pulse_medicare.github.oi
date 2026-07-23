@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - Login</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root {
+    --bg: linear-gradient(135deg,#009688,#26A69A);
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #009688;
+    --surface-alt: #f8fafc;
+    --border: rgba(15,23,42,0.08);
+}
+
+body.dark {
+    --bg: #0f1720;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --border: rgba(148,163,184,0.22);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.container{
+    width:950px;
+    height:560px;
+    background:var(--surface);
+    display:flex;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.left{
+    width:50%;
+    background:var(--primary);
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:40px;
+}
+
+.left i{
+    font-size:90px;
+    margin-bottom:20px;
+}
+
+.left h1{
+    font-size:36px;
+    margin-bottom:15px;
+}
+
+.left p{
+    text-align:center;
+    line-height:28px;
+}
+
+.right{
+    width:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:var(--surface);
+}
+
+.login-box{
+    width:330px;
+    background:var(--surface);
+}
+
+.login-box h2{
+    color:#009688;
+    margin-bottom:10px;
+}
+
+.login-box p{
+    color:#777;
+    margin-bottom:30px;
+}
+
+.input-box{
+    margin-bottom:20px;
+}
+
+.input-box label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+.input-box input{
+    width:100%;
+    padding:13px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+    font-size:15px;
+}
+
+.input-box input:focus{
+    border-color:#009688;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    background:#009688;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#00796B;
+}
+
+.error{
+    background:#ffebee;
+    color:#c62828;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+.footer{
+    margin-top:20px;
+    text-align:center;
+    color:#777;
+    font-size:14px;
+}
+
+@media(max-width:850px){
+
+.container{
+    width:95%;
+    flex-direction:column;
+    height:auto;
+}
+
+.left,
+.right{
+    width:100%;
+    padding:40px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="left">
+
+<i class="fa-solid fa-heart-pulse"></i>
+
+<h1>Pulse Medicare</h1>
+
+<p>
+Hospital Management System
+<br><br>
+Manage Patients, Doctors,
+Appointments, Billing,
+Laboratory and Pharmacy
+efficiently.
+</p>
+
+</div>
+
+<div class="right">
+
+<div class="login-box">
+
+<h2>Welcome Back</h2>
+
+<p>Sign in to continue</p>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == 'error' %}
+            <div class="error">
+                {{ message }}
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% if error %}
+<div class="error">
+{{ error }}
+</div>
+{% endif %}
+
+<form method="POST">
+
+<div class="input-box">
+<label>Username</label>
+<input type="text"
+name="username"
+placeholder="Enter Username"
+required>
+</div>
+
+<div class="input-box">
+<label>Password</label>
+<input type="password"
+name="password"
+placeholder="Enter Password"
+required>
+</div>
+
+<button type="submit">
+<i class="fa-solid fa-right-to-bracket"></i>
+Login
+</button>
+
+</form>
+
+<div class="footer">
+
+© 2026 Pulse Medicare
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+(function() {
+    if (localStorage.getItem('dashboardTheme') === 'dark') {
+        document.body.classList.add('dark');
+    }
+})();
+</script>
+
+{% include '_pro_infotech_footer.html' %}
+</body>
+</html>

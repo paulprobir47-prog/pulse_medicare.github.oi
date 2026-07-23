@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - {{ action }}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #009688;
+    --surface-alt: #f8fbff;
+    --border: rgba(15,23,42,0.08);
+}
+
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --border: rgba(148,163,184,0.22);
+}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+body{
+    background:var(--bg);
+    color:var(--text);
+}
+.sidebar{
+    position:fixed;
+    width:80px;
+    height:100vh;
+    max-height:100vh;
+    background:var(--primary);
+    color:#fff;
+    overflow-y:auto;
+    overflow-x:hidden;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(255,255,255,0.35) transparent;
+    -webkit-overflow-scrolling:touch;
+    transition:width .25s ease;
+}
+.sidebar:hover{
+    width:240px;
+}
+.logo{
+    text-align:center;
+    padding:25px;
+    border-bottom:1px solid rgba(255,255,255,.2);
+}
+.logo i{
+    font-size:55px;
+}
+.logo h2{
+    margin-top:10px;
+    opacity:0;
+    max-height:0;
+    overflow:hidden;
+    transition:opacity .25s ease,max-height .25s ease;
+}
+.logo p{
+    opacity:0;
+    max-height:0;
+    overflow:hidden;
+    transition:opacity .25s ease,max-height .25s ease;
+}
+.sidebar:hover .logo h2,
+.sidebar:hover .logo p{
+    opacity:1;
+    max-height:120px;
+}
+.sidebar ul{
+    list-style:none;
+}
+.sidebar ul li{
+    padding:16px 25px;
+    transition:background .25s ease;
+}
+.sidebar ul li:hover{
+    background:#00796B;
+}
+.sidebar ul li a{
+    color:white;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:font-size .25s ease,justify-content .25s ease,padding .25s ease;
+}
+.sidebar:not(:hover) ul li a{
+    justify-content:center;
+    gap:0;
+    font-size:0;
+    padding:16px 0;
+    width:100%;
+    min-height:48px;
+    line-height:1;
+    overflow:visible;
+}
+.sidebar:not(:hover) ul li a i{
+    font-size:20px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:100%;
+}
+.main{
+    margin-left:80px;
+    padding:25px;
+    width:calc(100% - 80px);
+    transition:margin-left .25s ease,width .25s ease;
+}
+.sidebar:hover + .main{
+    margin-left:240px;
+    width:calc(100% - 240px);
+}
+.panel{
+    background:var(--surface);
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.08);
+    border:1px solid var(--border);
+}
+.panel h2{
+    color:var(--primary);
+    margin-bottom:15px;
+}
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+}
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+.form-group label{
+    font-weight:700;
+    color:#334155;
+    font-size:0.95rem;
+}
+.form-group input,
+.form-group select,
+.form-group textarea{
+    padding:10px 12px;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    background:var(--surface-alt);
+    color:var(--text);
+    font-size:0.95rem;
+}
+.form-group textarea{
+    min-height:120px;
+    resize:vertical;
+}
+.form-actions{
+    margin-top:20px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+}
+.btn,
+.btn-secondary{
+    padding:12px 18px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:700;
+    border:none;
+    cursor:pointer;
+}
+.btn{
+    background:var(--primary);
+    color:white;
+}
+.btn-secondary{
+    background:#e2e8f0;
+    color:#0f172a;
+}
+.btn:hover{
+    background:#0f766e;
+}
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+.topbar-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.theme-toggle, .notification-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+    transition:background .2s ease, color .2s ease, border-color .2s ease;
+}
+.theme-toggle:hover, .notification-btn:hover{
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+}
+.notification-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:20px;
+    height:20px;
+    padding:0 6px;
+    border-radius:999px;
+    background:#ef4444;
+    color:white;
+    font-size:0.75rem;
+    font-weight:700;
+}
+@media(max-width:900px){
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="main">
+    <div class="panel">
+        <div class="topbar">
+            <h2>{{ action }}</h2>
+            <div class="topbar-right">
+                <button type="button" id="themeToggle" class="theme-toggle"><i class="fa fa-moon"></i> Dark</button>
+                <button type="button" class="notification-btn"><i class="fa fa-bell"></i><span class="notification-badge">3</span></button>
+            </div>
+        </div>
+        <form method="POST" action="{{ form_action }}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <input id="full_name" type="text" name="full_name" value="{{ patient.full_name | default('') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                        <input id="age_years" type="number" name="age_years" value="{{ patient.age_years | default(0) }}" min="0" placeholder="Years" required>
+                        <input id="age_months" type="number" name="age_months" value="{{ patient.age_months | default(0) }}" min="0" max="11" placeholder="Months" required>
+                        <input id="age_days" type="number" name="age_days" value="{{ patient.age_days | default(0) }}" min="0" max="30" placeholder="Days" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select gender</option>
+                        <option value="Male" {% if patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if patient.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="tel" name="phone" value="{{ patient.phone | default('') }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="blood_group">Blood Group</label>
+                    <input id="blood_group" type="text" name="blood_group" value="{{ patient.blood_group | default('') }}">
+                </div>
+                <div class="form-group">
+                    <label for="admission_date">Admission Date</label>
+                    <input id="admission_date" type="date" name="admission_date" value="{{ patient.admission_date | default('') }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="guardian_name">Guardian Name</label>
+                    <input id="guardian_name" type="text" name="guardian_name" value="{{ patient.guardian_name | default('') }}" placeholder="Enter guardian name">
+                </div>
+                <div class="form-group">
+                    <label for="guardian_phone">Guardian Phone</label>
+                    <input id="guardian_phone" type="tel" name="guardian_phone" value="{{ patient.guardian_phone | default('') }}" placeholder="Enter guardian phone">
+                </div>
+                <div class="form-group">
+                    <label for="guardian_relation">Relation</label>
+                    <input id="guardian_relation" type="text" name="guardian_relation" value="{{ patient.guardian_relation | default('') }}" placeholder="Father / Mother / Spouse">
+                </div>
+                <div class="form-group" style="grid-column:span 2;">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address">{{ patient.address | default('') }}</textarea>
+                </div>
+                <div class="form-group" style="grid-column:span 2;">
+                    <label for="disease">Disease</label>
+                    <input id="disease" type="text" name="disease" value="{{ patient.disease | default('') }}">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn" type="submit">Save Patient</button>
+                <a class="btn-secondary" href="{{ url_for('patients') }}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+(function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const storedTheme = localStorage.getItem('dashboardTheme');
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            body.classList.add('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-sun"></i> Light';
+        } else {
+            body.classList.remove('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-moon"></i> Dark';
+        }
+        localStorage.setItem('dashboardTheme', theme);
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = body.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+    }
+
+    applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
+})();
+</script>

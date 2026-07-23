@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laboratory Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#f4f7fb;--surface:#ffffff;--border:#e5e7eb;--text:#0f172a;--muted:#64748b;--primary:#0f766e;--primary-soft:#e6f7f5;--accent:#2563eb;--accent-soft:#e8f0ff;--warning:#f59e0b;--danger:#ef4444;--shadow:0 16px 40px rgba(15,23,42,.08)}
+*{box-sizing:border-box}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#f8fbff 0%,#eef4ff 100%);color:var(--text);margin:0;padding:20px}
+.container{max-width:1280px;margin:0 auto;padding-left:18px;padding-right:18px}
+.hero{background:linear-gradient(135deg,var(--primary) 0%,#115e59 100%);color:#fff;border-radius:24px;padding:24px 28px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.hero h1{margin:0 0 8px;font-size:28px}
+.hero p{margin:0;opacity:.92;max-width:620px;line-height:1.6}
+.hero-badge{background:rgba(255,255,255,.16);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:8px}
+.stats-grid{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:16px;margin-top:18px}
+.stat-card{background:var(--surface);padding:18px 20px;border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow)}
+.stat-card .label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.stat-card .value{font-size:24px;font-weight:800;margin-top:6px;color:var(--primary)}
+.stat-card .hint{font-size:13px;color:var(--muted);margin-top:6px}
+.content-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:18px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.panel h3{margin:0 0 12px;font-size:18px}
+.chart-shell{position:relative;height:260px}
+.quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.quick-action{display:flex;align-items:center;gap:10px;padding:12px 13px;border:1px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);background:#fbfdff}
+.quick-action:hover{background:var(--primary-soft);border-color:#bbe6e2}
+.quick-action i{color:var(--primary);font-size:16px}
+.table-wrap{overflow:auto;margin-top:10px}
+.table{width:100%;border-collapse:collapse;font-size:14px}
+.table th,.table td{padding:10px 8px;border-bottom:1px solid #eef2f7;text-align:left}
+.table th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;padding:6px 8px;border-radius:999px;font-size:12px;font-weight:700;background:#eef2f7;color:#334155}
+.badge.ok{background:#dcfce7;color:#166534}
+.badge.warn{background:#fef3c7;color:#92400e}
+.lims-dropdown{position:relative}
+.lims-toggle{display:inline-flex;align-items:center;gap:8px;font-weight:700;padding:10px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;cursor:pointer}
+.lims-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;z-index:20;min-width:260px;padding:8px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 50px rgba(15,23,42,.14)}
+.lims-menu.show{display:grid;gap:4px}
+.lims-menu a{display:flex;align-items:center;gap:8px;border:0;border-radius:10px;background:transparent;padding:10px 12px;text-decoration:none;color:var(--text)}
+.lims-menu a:hover{background:var(--primary-soft);color:var(--primary)}
+@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}}
+@media(max-width:700px){body{padding:12px}.stats-grid{grid-template-columns:1fr}.quick-actions{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="container">
+    <section class="hero">
+        <div>
+            <div class="hero-badge"><i class="fa fa-flask"></i> Laboratory Operations</div>
+            <h1>Professional Lab Dashboard</h1>
+            <p>Monitor test collections, track monthly performance, and jump straight into daily lab tasks from one polished workspace.</p>
+        </div>
+        <div class="lims-dropdown">
+            <button type="button" class="lims-toggle" id="limsSettingToggle" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-sliders"></i> Lab Settings <i class="fa fa-chevron-down"></i>
+            </button>
+            <div class="lims-menu" id="limsSettingMenu">
+                <a href="{{ url_for('lims_settings', section='rate_category') }}"><i class="fa fa-tags"></i> Rate Category</a>
+                <a href="{{ url_for('lims_settings', section='instrument') }}"><i class="fa fa-microscope"></i> Instrument</a>
+                <a href="{{ url_for('lims_settings', section='lab_group') }}"><i class="fa fa-layer-group"></i> Lab Group</a>
+                <a href="{{ url_for('lims_settings', section='test') }}"><i class="fa fa-vial-circle-check"></i> Test</a>
+                <a href="{{ url_for('lims_settings', section='method') }}"><i class="fa fa-list-check"></i> Method</a>
+                <a href="{{ url_for('lims_settings', section='sample_vial') }}"><i class="fa fa-vial"></i> Sample Vial</a>
+                <a href="{{ url_for('lims_settings', section='units') }}"><i class="fa fa-ruler"></i> Units</a>
+                <a href="{{ url_for('lims_settings', section='kits') }}"><i class="fa fa-box-open"></i> Kits</a>
+                <a href="{{ url_for('lims_settings', section='parameter') }}"><i class="fa fa-sliders"></i> Parameter</a>
+                <a href="{{ url_for('lims_settings', section='report_comment_master') }}"><i class="fa fa-comment-medical"></i> Report Comment Master</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-grid">
+        <div class="stat-card">
+            <div class="label">Today's Collection</div>
+            <div class="value" id="todayAmt">₹ 0.00</div>
+            <div class="hint">Live billing value for today</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">This Month</div>
+            <div class="value" id="monthAmt">₹ 0.00</div>
+            <div class="hint">Current month activity</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">This Year</div>
+            <div class="value" id="yearAmt">₹ 0.00</div>
+            <div class="hint">Year to date performance</div>
+        </div>
+        <div class="stat-card">
+            <div class="label">Tests Logged</div>
+            <div class="value" id="totalTests">0</div>
+            <div class="hint">Total records in the lab module</div>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <div class="panel">
+            <h3><i class="fa fa-chart-line"></i> Monthly Collection Trend</h3>
+            <div class="chart-shell"><canvas id="monthChart"></canvas></div>
+        </div>
+        <div class="panel">
+            <h3><i class="fa fa-chart-pie"></i> Department Mix</h3>
+            <div class="chart-shell"><canvas id="deptChart"></canvas></div>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <div class="panel">
+            <h3><i class="fa fa-bolt"></i> Quick Actions</h3>
+            <div class="quick-actions">
+                <a class="quick-action" href="{{ url_for('laboratory') }}"><i class="fa fa-list-check"></i> Manage Tests</a>
+                <a class="quick-action" href="{{ url_for('add_laboratory') }}"><i class="fa fa-plus"></i> Add Lab Test</a>
+                <a class="quick-action" href="{{ url_for('laboratory_today_collection') }}"><i class="fa fa-receipt"></i> Today's Transactions</a>
+                <a class="quick-action" href="{{ url_for('export_laboratory') }}"><i class="fa fa-file-export"></i> Export Lab CSV</a>
+            </div>
+        </div>
+        <div class="panel">
+            <h3><i class="fa fa-clipboard-list"></i> Recent Status Overview</h3>
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sample Tracking</td>
+                            <td><span class="badge ok">Operational</span></td>
+                        </tr>
+                        <tr>
+                            <td>Billing Link</td>
+                            <td><span class="badge ok">Synced</span></td>
+                        </tr>
+                        <tr>
+                            <td>Result Review</td>
+                            <td><span class="badge warn">Needs Review</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+async function loadData(){
+    try {
+        const res = await fetch('/laboratory/dashboard/data');
+        const json = await res.json();
+        document.getElementById('todayAmt').textContent = '₹ ' + Number(json.total_today || 0).toFixed(2);
+        document.getElementById('monthAmt').textContent = '₹ ' + Number(json.total_month || 0).toFixed(2);
+        document.getElementById('yearAmt').textContent = '₹ ' + Number(json.total_year || 0).toFixed(2);
+        document.getElementById('totalTests').textContent = json.total_tests || 0;
+
+        const monthCtx = document.getElementById('monthChart').getContext('2d');
+        if (window.monthChartInstance) window.monthChartInstance.destroy();
+        window.monthChartInstance = new Chart(monthCtx, {
+            type: 'bar',
+            data: {
+                labels: (json.month_days || []).map(d => d.toString()),
+                datasets: [{ label: 'Lab Collection', data: json.month_amounts || [], backgroundColor: '#0f766e' }]
+            },
+            options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+
+        const deptCtx = document.getElementById('deptChart').getContext('2d');
+        if (window.deptChartInstance) window.deptChartInstance.destroy();
+        window.deptChartInstance = new Chart(deptCtx, {
+            type: 'pie',
+            data: {
+                labels: json.departments || [],
+                datasets: [{ data: json.dept_counts || [], backgroundColor: ['#0f766e','#2dd4bf','#f59e0b','#ef4444','#60a5fa'] }]
+            },
+            options: { maintainAspectRatio: false }
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}
+loadData();
+
+const limsSettingToggle = document.getElementById('limsSettingToggle');
+const limsSettingMenu = document.getElementById('limsSettingMenu');
+if (limsSettingToggle && limsSettingMenu) {
+    limsSettingToggle.addEventListener('click', function () {
+        const isOpen = limsSettingMenu.classList.toggle('show');
+        limsSettingToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!limsSettingToggle.contains(event.target) && !limsSettingMenu.contains(event.target)) {
+            limsSettingMenu.classList.remove('show');
+            limsSettingToggle.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

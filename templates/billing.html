@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - Billing</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #009688;
+    --surface-alt: #f8fbff;
+    --border: rgba(15,23,42,0.08);
+}
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --border: rgba(148,163,184,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:var(--bg);color:var(--text);}
+.sidebar{position:fixed;width:80px;height:100%;background:var(--primary);color:#fff;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.35) transparent;transition:width .25s ease;}
+.sidebar:hover{width:240px;}
+.logo{text-align:center;padding:25px;border-bottom:1px solid rgba(255,255,255,.2);}
+.logo i{font-size:55px;}
+.logo h2{margin-top:10px;opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.logo p{opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.sidebar:hover .logo h2,
+.sidebar:hover .logo p{opacity:1;max-height:100px;}
+.sidebar:not(:hover) .logo{padding:18px 0;}
+.sidebar:not(:hover) .logo h2,
+.sidebar:not(:hover) .logo p{opacity:0;max-height:0;margin:0;padding:0;visibility:hidden;}
+.sidebar:not(:hover) .logo i{margin:0 auto;font-size:30px;}
+.sidebar ul{list-style:none;}
+.sidebar ul li{padding:16px 25px;transition:background .25s ease;}
+.sidebar ul li:hover{background:#00796B;}
+.sidebar ul li a{color:white;text-decoration:none;display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar:not(:hover) ul li a{justify-content:center;font-size:0;padding:16px 0;}
+.sidebar:not(:hover) ul li a i{font-size:18px;}
+.main{margin-left:80px;padding:25px;width:calc(100% - 80px);transition:margin-left .25s ease,width .25s ease;}
+.sidebar:hover + .main{margin-left:240px;width:calc(100% - 240px);}
+.panel{background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08);border:1px solid var(--border);}
+.panel h2{color:#009688;margin-bottom:15px;}
+.topbar, .top-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.topbar h2, .top-bar h2{color:var(--primary);}
+.topbar-left{display:flex;align-items:center;gap:10px;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.theme-toggle, .notification-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s ease, color .2s ease, border-color .2s ease;}
+.theme-toggle:hover, .notification-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary);} 
+.notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#ef4444;color:white;font-size:0.75rem;font-weight:700;}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 20px;border-radius:10px;background:var(--primary);color:#fff;text-decoration:none;font-weight:700;border:none;cursor:pointer;}
+.btn:hover{background:#0f766e;}
+.table-wrapper{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;background:var(--surface-alt);}
+th,td{padding:14px 16px;border-bottom:1px solid var(--border);text-align:left;color:var(--text);}
+th{background:rgba(0,150,136,.08);font-weight:700;}
+.status-pill{display:inline-flex;padding:6px 12px;border-radius:999px;font-size:0.9rem;font-weight:700;}
+.status-pending{background:#FFEBCE;color:#b45309;}
+.status-paid{background:#D1FAE5;color:#047857;}
+.status-due{background:#FEE2E2;color:#991B1B;}
+@media(max-width:900px){.top-bar{flex-direction:column;align-items:flex-start;}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="main">
+    <div class="panel">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h2>Billing</h2>
+            </div>
+            <div class="topbar-right">
+                <form action="{{ url_for('billing') }}" method="get" style="display:flex;align-items:center;gap:6px;">
+                    <input type="text" name="q" value="{{ query | default('') }}" placeholder="Search billing..." style="padding:8px 12px;border-radius:6px;border:1px solid #cbd5e1;" />
+                    <button type="submit" class="btn" style="padding:10px 16px;">Search</button>
+                </form>
+                <button type="button" id="themeToggle" class="theme-toggle"><i class="fa fa-moon"></i> Dark</button>
+                <button type="button" class="notification-btn"><i class="fa fa-bell"></i><span class="notification-badge">3</span></button>
+                <a class="btn" href="/add_billing"><i class="fa fa-plus"></i> Add Billing</a>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bill ID</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Bill Date</th>
+                        <th>Consultation</th>
+                        <th>Medicine</th>
+                        <th>Lab Fee</th>
+                        <th>Room Fee</th>
+                        <th>Other</th>
+                        <th>Total</th>
+                        <th>Payment</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bill in bills %}
+                    <tr>
+                        <td>{{ bill.bill_id }}</td>
+                        <td>{{ bill.patient_name }}</td>
+                        <td>{{ bill.doctor_name }}</td>
+                        <td>{{ bill.bill_date }}</td>
+                        <td>{{ bill.consultation_fee }}</td>
+                        <td>{{ bill.medicine_fee }}</td>
+                        <td>{{ bill.lab_fee }}</td>
+                        <td>{{ bill.room_fee }}</td>
+                        <td>{{ bill.other_charges }}</td>
+                        <td>{{ bill.total_amount }}</td>
+                        <td>
+                            <span class="status-pill {% if bill.payment_status == 'Paid' %}status-paid{% elif bill.payment_status == 'Pending' %}status-pending{% else %}status-due{% endif %}">{{ bill.payment_status }}</span>
+                        </td>
+                        <td><a class="btn" href="{{ url_for('print_billing', bill_id=bill.bill_id) }}" target="_blank" rel="noopener noreferrer" style="font-size:0.85rem;padding:10px 14px;">Print</a></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="12" style="text-align:center;padding:24px 0;color:var(--muted);">No billing records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const storedTheme = localStorage.getItem('dashboardTheme') || 'light';
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-sun"></i> Light';
+        } else {
+            body.classList.remove('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-moon"></i> Dark';
+        }
+        localStorage.setItem('dashboardTheme', theme);
+    };
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            applyTheme(body.classList.contains('dark') ? 'light' : 'dark');
+        });
+    }
+    applyTheme(storedTheme);
+})();
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

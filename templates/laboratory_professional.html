@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - Laboratory</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--bg:#eef3f8;--surface:#ffffff;--text:#0f172a;--muted:#64748b;--primary:#009688;--sidebar:#064e47;--border:rgba(15,23,42,0.08);--shadow:0 24px 80px rgba(15,23,42,0.08);} 
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial,sans-serif;margin:0}
+.container{max-width:1200px;margin:28px auto;padding:0 20px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.header h1{font-size:22px;margin:0;color:var(--primary)}
+.actions{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:var(--primary);color:#fff;text-decoration:none;font-weight:700;border:none;cursor:pointer}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.filters{display:flex;gap:12px;align-items:center}
+.card{background:var(--surface);padding:18px;border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.table-box{margin-top:16px}
+.table-box table{width:100%;border-collapse:collapse}
+.table-box th,.table-box td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:left}
+.table-box th{background:var(--primary);color:#fff;font-weight:700}
+.status-pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-weight:700}
+.status-pending{background:#ffedd5;color:#b45309}
+.status-completed{background:#ecfdf5;color:#166534}
+.status-confirmed{background:#dbeafe;color:#1d4ed8}
+.actions-cell a{margin-right:8px;color:var(--muted);text-decoration:none}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.search-input{padding:10px 12px;border-radius:8px;border:1px solid var(--border);min-width:280px}
+@media(max-width:900px){.filters{flex-direction:column;align-items:stretch}.search-input{width:100%}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="container">
+    <div class="header">
+        <h1><i class="fa fa-flask"></i> Laboratory</h1>
+        <div class="actions">
+            <a href="/add_laboratory" class="btn"><i class="fa fa-plus"></i> Add Test</a>
+            <a href="#" id="exportCsv" class="btn-ghost">Export CSV</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div class="filters">
+                <form id="searchForm" action="{{ url_for('laboratory') }}" method="get" style="display:flex;gap:8px;align-items:center">
+                    <input name="q" placeholder="Search patient, test, doctor..." value="{{ request.args.get('q','') }}" class="search-input" />
+                    <select name="status" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border)">
+                        <option value="">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Confirmed">Confirmed</option>
+                    </select>
+                    <button type="submit" class="btn-ghost">Filter</button>
+                </form>
+            </div>
+            <div class="topbar-right">
+                <button id="refreshBtn" class="btn-ghost"><i class="fa fa-rotate"></i> Refresh</button>
+            </div>
+        </div>
+
+        <div class="table-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Test ID</th>
+                        <th>Patient</th>
+                        <th>Test</th>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Result</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% if labs %}
+                    {% for lab in labs %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ lab.lab_id }}</td>
+                        <td>{{ lab.patient_name or '—' }}</td>
+                        <td>{{ lab.test_name or '—' }}</td>
+                        <td>{{ lab.doctor_name or '—' }}</td>
+                        <td>{{ lab.test_date }}</td>
+                        <td><span class="status-pill {% if lab.status=='Completed' %}status-completed{% elif lab.status=='Pending' %}status-pending{% else %}status-confirmed{% endif %}">{{ lab.status }}</span></td>
+                        <td>{{ lab.result or '—' }}</td>
+                        <td class="actions-cell">
+                            <a href="/view_laboratory/{{ lab.lab_id }}" title="View"><i class="fa fa-eye"></i></a>
+                            <a href="/edit_laboratory/{{ lab.lab_id }}" title="Edit"><i class="fa fa-pen"></i></a>
+                            <a href="/print_laboratory/{{ lab.lab_id }}" title="Print"><i class="fa fa-print"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="9" style="text-align:center;padding:18px;color:var(--muted)">No laboratory records found.</td></tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('exportCsv')?.addEventListener('click', function(e){
+    e.preventDefault();
+    const params = new URLSearchParams(new FormData(document.getElementById('searchForm'))).toString();
+    window.location.href = '/laboratory/export?'+params;
+});
+
+document.getElementById('refreshBtn')?.addEventListener('click', function(){
+    window.location.reload();
+});
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

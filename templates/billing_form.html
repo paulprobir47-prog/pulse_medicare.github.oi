@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - {{ action }}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #475569;
+    --primary: #009688;
+    --surface-alt: #f8fbff;
+    --border: rgba(15,23,42,0.08);
+}
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --border: rgba(148,163,184,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{background:var(--bg);color:var(--text);}
+.sidebar{position:fixed;width:80px;height:100%;background:var(--primary);color:#fff;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.35) transparent;transition:width .25s ease;}
+.sidebar:hover{width:240px;}
+.logo{text-align:center;padding:25px;border-bottom:1px solid rgba(255,255,255,.2);}
+.logo i{font-size:55px;}
+.logo h2{margin-top:10px;opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.logo p{opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.sidebar:hover .logo h2,
+.sidebar:hover .logo p{opacity:1;max-height:120px;}
+.sidebar:not(:hover) .logo{padding:18px 0;}
+.sidebar:not(:hover) .logo h2,
+.sidebar:not(:hover) .logo p{opacity:0;max-height:0;margin:0;padding:0;visibility:hidden;}
+.sidebar:not(:hover) .logo i{margin:0 auto;font-size:30px;}
+.sidebar ul{list-style:none;}
+.sidebar ul li{padding:16px 25px;transition:background .25s ease;}
+.sidebar ul li:hover{background:#00796B;}
+.sidebar ul li a{color:white;text-decoration:none;display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:font-size .25s ease,justify-content .25s ease,padding .25s ease;}
+.sidebar:not(:hover) ul li a{justify-content:center;font-size:0;}
+.sidebar:not(:hover) ul li a i{font-size:18px;}
+.main{margin-left:80px;padding:25px;width:calc(100% - 80px);transition:margin-left .25s ease,width .25s ease;}
+.sidebar:hover + .main{margin-left:240px;width:calc(100% - 240px);}
+.panel{background:var(--surface);padding:30px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.08);border:1px solid var(--border);}
+.panel h2{color:#009688;margin-bottom:15px;}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group label{font-weight:700;color:#334155;font-size:0.95rem;}
+.form-group input,
+.form-group select{padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;background:var(--surface-alt);color:var(--text);font-size:0.95rem;}
+.form-actions{margin-top:20px;display:flex;gap:14px;flex-wrap:wrap;}
+.btn,.btn-secondary{padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700;border:none;cursor:pointer;}
+.btn{background:#009688;color:white;}
+.btn-secondary{background:#e2e8f0;color:#0f172a;}
+.btn:hover{background:#00796B;}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.theme-toggle, .notification-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid rgba(0,0,0,.08);background:var(--surface);color:var(--text);font-weight:700;cursor:pointer;text-decoration:none;}
+.theme-toggle:hover, .notification-btn:hover{background:rgba(0,0,0,.05);}
+.notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#ef4444;color:white;font-size:0.75rem;font-weight:700;}
+@media(max-width:900px){.form-grid{grid-template-columns:1fr;}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="main">
+    <div class="panel">
+        <div class="topbar">
+            <h2>{{ action }}</h2>
+            <div class="topbar-right">
+                <button type="button" id="themeToggle" class="theme-toggle"><i class="fa fa-moon"></i> Dark</button>
+                <button type="button" class="notification-btn"><i class="fa fa-bell"></i><span class="notification-badge">3</span></button>
+            </div>
+        </div>
+        <form method="POST" action="{{ form_action }}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="patient_id">Patient</label>
+                    <select id="patient_id" name="patient_id" required>
+                        <option value="">Select patient</option>
+                        {% for patient in patients %}
+                        <option value="{{ patient.patient_id }}">{{ patient.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="doctor_id">Doctor</label>
+                    <select id="doctor_id" name="doctor_id" required>
+                        <option value="">Select doctor</option>
+                        {% for doctor in doctors %}
+                        <option value="{{ doctor.doctor_id }}">{{ doctor.doctor_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bill_date">Bill Date</label>
+                    <input id="bill_date" type="date" name="bill_date" value="{{ bill.bill_date | default('') }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="consultation_fee">Consultation Fee</label>
+                    <input id="consultation_fee" type="number" step="0.01" name="consultation_fee" value="{{ bill.consultation_fee | default('0.00') }}">
+                </div>
+                <div class="form-group">
+                    <label for="medicine_fee">Medicine Fee</label>
+                    <input id="medicine_fee" type="number" step="0.01" name="medicine_fee" value="{{ bill.medicine_fee | default('0.00') }}">
+                </div>
+                <div class="form-group">
+                    <label for="lab_fee">Lab Fee</label>
+                    <input id="lab_fee" type="number" step="0.01" name="lab_fee" value="{{ bill.lab_fee | default('0.00') }}">
+                </div>
+                <div class="form-group">
+                    <label for="room_fee">Room Fee</label>
+                    <input id="room_fee" type="number" step="0.01" name="room_fee" value="{{ bill.room_fee | default('0.00') }}">
+                </div>
+                <div class="form-group">
+                    <label for="other_charges">Other Charges</label>
+                    <input id="other_charges" type="number" step="0.01" name="other_charges" value="{{ bill.other_charges | default('0.00') }}">
+                </div>
+                <div class="form-group">
+                    <label for="payment_method">Payment Method</label>
+                    <select id="payment_method" name="payment_method">
+                        <option value="Cash" {% if bill.payment_method == 'Cash' %}selected{% endif %}>Cash</option>
+                        <option value="Card" {% if bill.payment_method == 'Card' %}selected{% endif %}>Card</option>
+                        <option value="Online" {% if bill.payment_method == 'Online' %}selected{% endif %}>Online</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payment_status">Payment Status</label>
+                    <select id="payment_status" name="payment_status">
+                        <option value="Pending" {% if bill.payment_status == 'Pending' %}selected{% endif %}>Pending</option>
+                        <option value="Paid" {% if bill.payment_status == 'Paid' %}selected{% endif %}>Paid</option>
+                        <option value="Cancelled" {% if bill.payment_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn" type="submit">Save Bill</button>
+                <a class="btn-secondary" href="{{ url_for('billing') }}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+(function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const storedTheme = localStorage.getItem('dashboardTheme');
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            body.classList.add('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-sun"></i> Light';
+        } else {
+            body.classList.remove('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-moon"></i> Dark';
+        }
+        localStorage.setItem('dashboardTheme', theme);
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const nextTheme = body.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(nextTheme);
+        });
+    }
+
+    applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
+})();
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

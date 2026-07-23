@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - Sub Menu</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+<style>
+:root {
+    --bg: #eef3f8;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --primary: #0f766e;
+    --primary-strong: #0d5f59;
+    --primary-soft: #ccfbf1;
+    --danger: #dc2626;
+    --warning: #f97316;
+    --border: rgba(15, 23, 42, 0.09);
+    --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+.main {
+    min-height: 100vh;
+    margin-left: 78px;
+    width: calc(100% - 78px);
+    padding: 26px;
+    transition: margin-left 0.22s ease, width 0.22s ease;
+}
+.page-header,
+.panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+}
+.title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.title-wrap > i {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+h1,
+h2 {
+    margin: 0;
+    letter-spacing: 0;
+}
+h1 { font-size: 24px; }
+h2 { font-size: 18px; }
+.title-wrap p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+.header-actions,
+.search-form,
+.form-actions,
+.row-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.search-form {
+    min-width: min(100%, 360px);
+    justify-content: flex-end;
+}
+.search-box {
+    position: relative;
+    flex: 1 1 230px;
+}
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+}
+.search-box input {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px 0 36px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    background: #f8fafc;
+    font: inherit;
+}
+.panel {
+    margin-bottom: 18px;
+    overflow: hidden;
+}
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+}
+.menu-form {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 14px;
+    padding: 20px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.form-group label {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+.form-group input,
+.form-group select {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    background: #f8fafc;
+    font: inherit;
+}
+.form-actions {
+    grid-column: 1 / -1;
+}
+.btn {
+    min-height: 38px;
+    padding: 0 13px;
+    border: 0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: white;
+    background: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+}
+.btn:hover { background: var(--primary-strong); }
+.btn-muted {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+.btn-muted:hover { background: #cbd5e1; }
+.btn-warning { background: var(--warning); }
+.btn-warning:hover { background: #ea580c; }
+.btn-danger { background: var(--danger); }
+.btn-danger:hover { background: #b91c1c; }
+.btn-small {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+}
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th,
+td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: middle;
+}
+th {
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+td {
+    font-size: 14px;
+}
+.menu-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+}
+.menu-name i {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+.root-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 8px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 700;
+}
+.mono {
+    color: var(--muted);
+    font-family: Consolas, "Courier New", monospace;
+}
+.status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(22, 163, 74, 0.12);
+    color: #15803d;
+    font-weight: 700;
+    font-size: 12px;
+}
+.status.inactive {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.empty-row {
+    padding: 26px 16px;
+    color: var(--muted);
+    text-align: center;
+}
+.inline-form {
+    display: inline-flex;
+    margin: 0;
+}
+@media (max-width: 1180px) {
+    .menu-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 760px) {
+    .main {
+        margin-left: 64px;
+        width: calc(100% - 64px);
+        padding: 16px;
+    }
+    .page-header,
+    .panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .header-actions,
+    .search-form {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .menu-form {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+    th,
+    td {
+        padding: 12px;
+    }
+}
+</style>
+</head>
+<body>
+{% include '_sidebar.html' %}
+<main class="main">
+    <section class="page-header">
+        <div class="title-wrap">
+            <i class="fa fa-list"></i>
+            <div>
+                <h1>Sub Menu</h1>
+                <p>Add, edit, delete, and activate child sidebar menus.</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <form class="search-form" method="get" action="{{ url_for('sub_menu') }}">
+                <div class="search-box">
+                    <i class="fa fa-search"></i>
+                    <input type="search" name="q" value="{{ search_query }}" placeholder="Search sub menu" aria-label="Search sub menu">
+                </div>
+                <button class="btn btn-muted" type="submit">
+                    <i class="fa fa-search"></i>
+                    Search
+                </button>
+                {% if search_query %}
+                <a class="btn btn-muted" href="{{ url_for('sub_menu') }}">
+                    <i class="fa fa-xmark"></i>
+                    Clear
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2>
+                {% if edit_menu %}
+                <i class="fa fa-pen"></i> Edit Sub Menu
+                {% else %}
+                <i class="fa fa-plus"></i> Add Sub Menu
+                {% endif %}
+            </h2>
+            {% if edit_menu %}
+            <a class="btn btn-muted btn-small" href="{{ url_for('sub_menu') }}">
+                <i class="fa fa-xmark"></i>
+                Cancel Edit
+            </a>
+            {% endif %}
+        </div>
+        <form class="menu-form" method="post" action="{{ url_for('sub_menu') }}">
+            <input type="hidden" name="action" value="{% if edit_menu %}update{% else %}save{% endif %}">
+            {% if edit_menu %}
+            <input type="hidden" name="sub_menu_id" value="{{ edit_menu.sub_menu_id }}">
+            {% endif %}
+            <div class="form-group">
+                <label for="root_menu_id">Root Menu</label>
+                <select id="root_menu_id" name="root_menu_id" required>
+                    <option value="">Select root menu</option>
+                    {% for root in root_options %}
+                    <option value="{{ root.root_menu_id }}" {% if edit_menu and edit_menu.root_menu_id == root.root_menu_id %}selected{% endif %}>{{ root.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="name">Sub Menu Name</label>
+                <input id="name" name="name" value="{{ edit_menu.name if edit_menu else '' }}" placeholder="Root Menu" required>
+            </div>
+            <div class="form-group">
+                <label for="icon_name">Icon Name</label>
+                <input id="icon_name" name="icon_name" value="{{ edit_menu.icon_name if edit_menu else '' }}" placeholder="fa-list">
+            </div>
+            <div class="form-group">
+                <label for="url">URL</label>
+                <input id="url" name="url" value="{{ edit_menu.url if edit_menu else '' }}" placeholder="/settings/sub_menu" required>
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    {% set current_status = edit_menu.status if edit_menu else 'Active' %}
+                    <option value="Active" {% if current_status == 'Active' %}selected{% endif %}>Active</option>
+                    <option value="Inactive" {% if current_status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="display_order">Display Order</label>
+                <input id="display_order" name="display_order" type="number" min="0" value="{{ edit_menu.display_order if edit_menu else 0 }}">
+            </div>
+            <div class="form-actions">
+                <button class="btn" type="submit">
+                    {% if edit_menu %}
+                    <i class="fa fa-floppy-disk"></i>
+                    Update
+                    {% else %}
+                    <i class="fa fa-floppy-disk"></i>
+                    Save
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <h2><i class="fa fa-list"></i> Sub Menu List</h2>
+            <span class="mono">{{ sub_menus|length }} item{% if sub_menus|length != 1 %}s{% endif %}</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Root Menu</th>
+                        <th>Sub Menu</th>
+                        <th>Icon Name</th>
+                        <th>URL</th>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for menu in sub_menus %}
+                    <tr>
+                        <td><span class="root-name">{{ menu.root_name }}</span></td>
+                        <td>
+                            <span class="menu-name">
+                                <i class="fa {{ menu.icon_name }}"></i>
+                                {{ menu.name }}
+                            </span>
+                        </td>
+                        <td class="mono">{{ menu.icon_name }}</td>
+                        <td class="mono">{{ menu.url }}</td>
+                        <td>{{ menu.display_order }}</td>
+                        <td>
+                            <span class="status {% if menu.status == 'Inactive' %}inactive{% endif %}">
+                                {{ menu.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="row-actions">
+                                <a class="btn btn-muted btn-small" href="{{ url_for('sub_menu', edit=menu.sub_menu_id, q=search_query) }}">
+                                    <i class="fa fa-pen"></i>
+                                    Edit
+                                </a>
+                                <form class="inline-form" method="post" action="{{ url_for('sub_menu') }}">
+                                    <input type="hidden" name="action" value="toggle_status">
+                                    <input type="hidden" name="sub_menu_id" value="{{ menu.sub_menu_id }}">
+                                    {% if menu.status == 'Active' %}
+                                    <button class="btn btn-warning btn-small" type="submit">
+                                        <i class="fa fa-ban"></i>
+                                        Inactive
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-small" type="submit">
+                                        <i class="fa fa-check"></i>
+                                        Active
+                                    </button>
+                                    {% endif %}
+                                </form>
+                                <form class="inline-form" method="post" action="{{ url_for('sub_menu') }}" onsubmit="return confirm('Delete sub menu {{ menu.name }}?');">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="sub_menu_id" value="{{ menu.sub_menu_id }}">
+                                    <button class="btn btn-danger btn-small" type="submit">
+                                        <i class="fa fa-trash"></i>
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="empty-row">No sub menus found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

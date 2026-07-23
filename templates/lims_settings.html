@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LIMS Settings - {{ active_section.label }}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--bg:#f4f7fb;--surface:#fff;--text:#0f172a;--muted:#64748b;--primary:#065a50;--primary-soft:#eef7f6;--border:#e5e7eb;--shadow:0 16px 40px rgba(15,23,42,.08)}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#f8fbff 0%,#eef4ff 100%);color:var(--text);margin:0}
+.lims-settings-page .app-sidebar__footer,
+.lims-settings-page .app-page-credit{display:none !important}
+.container{max-width:1520px;margin:24px auto 36px;padding:0 24px 24px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;padding:24px 28px;border-radius:24px;background:linear-gradient(135deg,var(--primary) 0%,#0f766e 100%);color:#fff;box-shadow:var(--shadow)}
+.header h1{font-size:26px;margin:0;color:#fff}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:700}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:24px;box-shadow:var(--shadow)}
+.main-shell{min-width:0}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+label{display:grid;gap:8px;font-weight:700;color:var(--text)}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:12px;font:inherit;box-sizing:border-box;background:#fcfdff}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(6,90,80,.16);border-color:var(--primary)}
+textarea{min-height:112px;resize:vertical}
+.actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--primary);color:#fff;font-weight:700;cursor:pointer}
+.btn-ghost{background:#fff;color:var(--primary);border:1px solid var(--border)}
+.hint{color:var(--muted);line-height:1.6;margin:8px 0 0}
+.test-layout{display:grid;grid-template-columns:440px minmax(0,1fr);gap:20px}
+.test-panel{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.test-panel h3{margin:0 0 10px}
+.test-panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.test-panel-content{display:grid;gap:14px}
+.test-panel .field-group{display:grid;gap:10px;margin-bottom:12px}
+.test-panel .field-group label{font-size:13px;font-weight:700;color:var(--text)}
+.test-panel .field-group input,.test-panel .field-group select,.test-panel .field-group textarea{width:100%}
+.test-panel .button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.test-panel .button-row .btn{flex:1}
+.test-list-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.test-list-header .search-input{width:320px;max-width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px}
+.table-wrap{overflow:auto;max-height:560px}
+.small-hint{padding:18px;text-align:center;color:var(--muted)}
+.test-table{width:100%;border-collapse:collapse}
+.test-table th, .test-table td{padding:12px 10px;text-align:left;border-bottom:1px solid #f1f5f9}
+.test-table th{background:#f8fafc;color:#0f172a;font-weight:700}
+@media(max-width:1200px){.test-layout{grid-template-columns:1fr}.container{max-width:100%}}
+@media(max-width:760px){.container{padding:0 14px 18px}.header{flex-direction:column;align-items:flex-start}.test-list-header{flex-direction:column;align-items:flex-start}.test-panel .button-row{flex-direction:column}.form-grid{grid-template-columns:1fr}}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body class="lims-settings-page">
+{% include '_sidebar.html' %}
+<div class="container">
+    <div class="header">
+        <h1><i class="fa fa-sliders"></i> LIMS Settings</h1>
+        <a class="back-link" href="{{ url_for('laboratory_dashboard') }}"><i class="fa fa-arrow-left"></i> Laboratory Dashboard</a>
+    </div>
+
+    <div class="layout">
+        <main class="card main-shell">
+            {% if active_section.slug == 'test' %}
+            <div class="test-layout">
+                <section class="test-panel">
+                    <div class="test-panel-header">
+                        <h3>Create New Test</h3>
+                        <button type="button" class="btn btn-ghost" style="width:auto">Import From Excel</button>
+                    </div>
+                    <form method="post" action="{% if editing_item %}{{ url_for('edit_lims_item', item_id=editing_item.id, section=active_section.slug) }}{% else %}{{ url_for('lims_settings', section=active_section.slug) }}{% endif %}">
+                        <div class="test-panel-content">
+                            <div class="field-group">
+                                <label>Test Code</label>
+                                <input type="text" name="code" placeholder="Test Code" value="{{ editing_item.code if editing_item else '' }}">
+                            </div>
+                            <div class="field-group">
+                                <label>Test Name</label>
+                                <input type="text" name="name" placeholder="Test Name" value="{{ editing_item.name if editing_item else '' }}">
+                            </div>
+                            <div class="field-group">
+                                <label>Status</label>
+                                <select name="status">
+                                    <option value="Active" {% if editing_item and editing_item.status=='Active' %}selected{% endif %}>Active</option>
+                                    <option value="Inactive" {% if editing_item and editing_item.status=='Inactive' %}selected{% endif %}>Inactive</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label>Display Order</label>
+                                <input type="number" name="display_order" min="0" value="{{ editing_item.display_order if editing_item else 0 }}">
+                            </div>
+                            <div class="field-group">
+                                <label>Description</label>
+                                <textarea name="description" placeholder="Description">{{ editing_item.description if editing_item else '' }}</textarea>
+                            </div>
+                        </div>
+                        <div class="button-row">
+                            <button class="btn" type="submit">{% if editing_item %}Update{% else %}Save{% endif %}</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="test-panel">
+                    <div class="test-list-header">
+                        <h3>List of Tests</h3>
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                            <input type="search" class="search-input" placeholder="Type to search" name="q" value="{{ request.form.get('q','') }}">
+                            <button class="btn btn-ghost" type="button">Search</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="test-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Auto Gen. Code</th>
+                                    <th>Test Code</th>
+                                    <th>Test Name</th>
+                                    <th>Department</th>
+                                    <th>Sub-department</th>
+                                    <th>Lab Group</th>
+                                    <th>Sample Type</th>
+                                    <th>Test Category</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if items and items|length > 0 %}
+                                    {% for it in items %}
+                                    <tr>
+                                        <td>{{ loop.index }}.</td>
+                                        <td>{{ it.id }}</td>
+                                        <td>{{ it.code }}</td>
+                                        <td>{{ it.name }}</td>
+                                        <td>{{ it.description or '' }}</td>
+                                        <td>{{ it.status }}</td>
+                                        <td>{{ it.display_order }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <a class="btn btn-ghost" href="{{ url_for('edit_lims_item', item_id=it.id, section=active_section.slug) }}">Edit</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="10" class="small-hint">No records yet for {{ active_section.label|lower }}.</td></tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="hint" style="margin-top:10px">Total Rows: {{ items|length if items else 0 }}</div>
+                </section>
+            </div>
+            {% else %}
+            <h2 style="margin:0">{{ active_section.label }}</h2>
+            <p class="hint">Create and maintain master records for {{ active_section.label|lower }} used in laboratory workflows.</p>
+
+            <form method="post" action="{% if editing_item %}{{ url_for('edit_lims_item', item_id=editing_item.id, section=active_section.slug) }}{% else %}{{ url_for('lims_settings', section=active_section.slug) }}{% endif %}">
+                <div class="form-grid">
+                    <label>
+                        Name
+                        <input type="text" name="name" placeholder="{{ active_section.label }} name" value="{{ editing_item.name if editing_item else '' }}">
+                    </label>
+                    <label>
+                        Code
+                        <input type="text" name="code" placeholder="Optional code" value="{{ editing_item.code if editing_item else '' }}">
+                    </label>
+                    <label>
+                        Status
+                        <select name="status">
+                            <option value="Active" {% if editing_item and editing_item.status=='Active' %}selected{% endif %}>Active</option>
+                            <option value="Inactive" {% if editing_item and editing_item.status=='Inactive' %}selected{% endif %}>Inactive</option>
+                        </select>
+                    </label>
+                    <label>
+                        Display Order
+                        <input type="number" name="display_order" min="0" value="{{ editing_item.display_order if editing_item else 0 }}">
+                    </label>
+                </div>
+                <label style="margin-top:12px">
+                    Description / Notes
+                    <textarea name="description" placeholder="Enter details">{{ editing_item.description if editing_item else '' }}</textarea>
+                </label>
+                <div class="actions">
+                    <button class="btn" type="submit">{% if editing_item %}Update{% else %}Save{% endif %}</button>
+                    {% if editing_item %}
+                    <a class="btn btn-ghost" href="{{ url_for('lims_settings', section=active_section.slug) }}">Cancel Edit</a>
+                    {% endif %}
+                    <a class="btn btn-ghost" href="{{ url_for('laboratory_dashboard') }}">Cancel</a>
+                </div>
+            </form>
+            
+            <hr style="margin:18px 0">
+            <h3 style="margin:0 0 8px 0">Saved {{ active_section.label }}</h3>
+            {% if items and items|length > 0 %}
+            <div style="overflow:auto;margin-top:8px">
+                <table style="width:100%;border-collapse:collapse">
+                    <thead>
+                        <tr style="text-align:left;border-bottom:1px solid #e5e7eb">
+                            <th style="padding:8px">Name</th>
+                            <th style="padding:8px">Code</th>
+                            <th style="padding:8px">Status</th>
+                            <th style="padding:8px">Order</th>
+                            <th style="padding:8px">Created</th>
+                            <th style="padding:8px">Notes</th>
+                            <th style="padding:8px">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for it in items %}
+                        <tr style="border-bottom:1px solid #f1f5f9">
+                            <td style="padding:8px">{{ it.name }}</td>
+                            <td style="padding:8px">{{ it.code }}</td>
+                            <td style="padding:8px">{{ it.status }}</td>
+                            <td style="padding:8px">{{ it.display_order }}</td>
+                            <td style="padding:8px">{{ it.created_at }}</td>
+                            <td style="padding:8px">{{ it.description or '' }}</td>
+                                    <td style="padding:8px">
+                                        <a class="btn btn-ghost" href="{{ url_for('edit_lims_item', item_id=it.id, section=active_section.slug) }}">Edit</a>
+                                        {% if active_section.slug == 'rate_category' %}
+                                        <a class="btn btn-ghost" href="{{ url_for('update_rate', category_id=it.id) }}">Update Rate</a>
+                                        {% endif %}
+                                        <form method="post" action="{{ url_for('delete_lims_item', item_id=it.id) }}" style="display:inline;margin-left:6px" onsubmit="return confirm('Delete this record?');">
+                                            <button class="btn btn-ghost" type="submit">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="hint" style="margin-top:8px">No records yet for {{ active_section.label|lower }}.</p>
+            {% endif %}
+            {% endif %}
+        </main>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>

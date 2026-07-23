@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse Medicare - Appointments</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+    --bg: #f4f6f9;
+    --surface: #ffffff;
+    --text: #0f1f3a;
+    --muted: #64748b;
+    --primary: #009688;
+    --surface-alt: #f8fafc;
+    --sidebar: #009688;
+    --border: rgba(15,23,42,0.08);
+}
+body.dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --primary: #2dd4bf;
+    --surface-alt: #111b2d;
+    --sidebar: #071821;
+    --border: rgba(148,163,184,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:var(--bg);color:var(--text);}
+.sidebar{position:fixed;width:80px;height:100%;background:var(--sidebar);color:#fff;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.35) transparent;transition:width .25s ease;}
+.sidebar:hover{width:240px;}
+.logo{text-align:center;padding:25px;border-bottom:1px solid rgba(255,255,255,.2);}
+.logo i{font-size:55px;}
+.logo h2{margin-top:10px;opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.logo p{opacity:0;max-height:0;overflow:hidden;transition:opacity .25s ease,max-height .25s ease;}
+.sidebar:hover .logo h2,
+.sidebar:hover .logo p{opacity:1;max-height:120px;}
+.sidebar:not(:hover) .logo{padding:18px 0;}
+.sidebar:not(:hover) .logo h2,
+.sidebar:not(:hover) .logo p{opacity:0;max-height:0;margin:0;padding:0;visibility:hidden;}
+.sidebar:not(:hover) .logo i{margin:0 auto;font-size:30px;}
+.sidebar ul{list-style:none;}
+.sidebar ul li{padding:16px 25px;transition:background .25s ease;}
+.sidebar ul li:hover{background:#00796B;}
+.sidebar ul li a{color:white;text-decoration:none;display:flex;align-items:center;gap:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:font-size .25s ease,justify-content .25s ease,padding .25s ease;}
+.sidebar:not(:hover) ul li a{justify-content:center;font-size:0;padding:16px 0;}
+.sidebar:not(:hover) ul li a i{font-size:18px;}
+.main{margin-left:80px;padding:25px;width:calc(100% - 80px);transition:margin-left .25s ease,width .25s ease;background:var(--bg);}
+.sidebar:hover + .main{margin-left:240px;width:calc(100% - 240px);}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+.topbar h2{color:var(--primary);}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.theme-toggle, .notification-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s ease, color .2s ease, border-color .2s ease;}
+.theme-toggle:hover, .notification-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary);} 
+.notification-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#ef4444;color:white;font-size:0.75rem;font-weight:700;}
+.btn{background:var(--primary);color:white;padding:10px 20px;text-decoration:none;border-radius:5px;}
+.btn:hover{background:#0f766e;}
+.table-box{background:var(--surface);padding:20px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.12);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:12px;border-bottom:1px solid #ddd;text-align:left;}
+th{background:var(--primary);color:white;}
+.status-pending{color:orange;font-weight:700;}
+.status-confirmed{color:blue;font-weight:700;}
+.status-completed{color:green;font-weight:700;}
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+<body>
+{% include '_sidebar.html' %}
+<div class="main">
+<div class="topbar">
+<h2>Appointments</h2>
+<div class="topbar-right">
+    <form action="{{ url_for('appointments') }}" method="get" style="display:flex;align-items:center;gap:6px;">
+        <input type="text" name="q" value="{{ query | default('') }}" placeholder="Search appointments..." style="padding:8px 12px;border-radius:6px;border:1px solid #cbd5e1;" />
+        <button type="submit" class="btn" style="padding:10px 16px;">Search</button>
+    </form>
+    <button type="button" id="themeToggle" class="theme-toggle"><i class="fa fa-moon"></i> Dark</button>
+    <button type="button" class="notification-btn"><i class="fa fa-bell"></i><span class="notification-badge">3</span></button>
+    <a href="/add_appointment" class="btn"><i class="fa fa-plus"></i> Add Appointment</a>
+</div>
+</div>
+<div class="table-box">
+<table>
+<tr>
+<th>No.</th>
+<th>ID</th>
+<th>Patient</th>
+<th>Doctor</th>
+<th>Date</th>
+<th>Time</th>
+<th>Status</th>
+</tr>
+{% for appointment in appointments %}
+<tr>
+<td>{{ loop.index }}</td>
+<td>{{ appointment.appointment_id }}</td>
+<td>{{ appointment.patient_name }}</td>
+<td>{{ appointment.doctor_name }}</td>
+<td>{{ appointment.appointment_date }}</td>
+<td>{{ appointment.appointment_time }}</td>
+<td>
+{% if appointment.status == 'Completed' %}
+<span class="status-completed">Completed</span>
+{% elif appointment.status == 'Pending' %}
+<span class="status-pending">Pending</span>
+{% else %}
+<span class="status-confirmed">{{ appointment.status }}</span>
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+</div>
+<script>
+(function() {
+    const themeToggle = document.getElementById('themeToggle');
+    const body = document.body;
+    const storedTheme = localStorage.getItem('dashboardTheme') || 'light';
+    const applyTheme = (theme) => {
+        if (theme === 'dark') {
+            body.classList.add('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-sun"></i> Light';
+        } else {
+            body.classList.remove('dark');
+            if (themeToggle) themeToggle.innerHTML = '<i class="fa fa-moon"></i> Dark';
+        }
+        localStorage.setItem('dashboardTheme', theme);
+    };
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            applyTheme(body.classList.contains('dark') ? 'light' : 'dark');
+        });
+    }
+    applyTheme(storedTheme);
+})();
+</script>
+<script src="{{ url_for('static', filename='js/sidebar.js') }}"></script>
+</body>
+</html>
