@@ -23,7 +23,7 @@ def _mysql_config_from_env():
         config = {
             "host": os.environ.get("MYSQL_HOST") or os.environ.get("DB_HOST") or "localhost",
             "user": os.environ.get("MYSQL_USER") or os.environ.get("DB_USER") or "root",
-            "password": os.environ.get("MYSQL_PASSWORD") or os.environ.get("DB_PASSWORD") or os.environ.get("PASSWORD", ""),
+            "password": os.environ.get("MYSQL_PASSWORD") or os.environ.get("DB_PASSWORD") or os.environ.get("PASSWORD", "pulse_medicare"),
             "database": os.environ.get("MYSQL_DB") or os.environ.get("MYSQL_DATABASE") or os.environ.get("DB_NAME") or "pulse_medicare",
         }
         if os.environ.get("MYSQL_PORT") or os.environ.get("DB_PORT"):
